@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Guía 8: Ecuaciones Exponenciales - Robust v2 (Fixed)</title>
+    <title>GUÍA INTERACTIVA 8 "ECUACIONES EXPONENCIALES Y LOGARÍTMICAS"</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700&display=swap"
@@ -256,23 +256,17 @@
     <div id="app-container">
         <header id="global-header">
             <span>Escolaris - Matemática 5to B</span>
-            <span>Guía 8: Ecuaciones Exponenciales</span>
+            <span>GUÍA INTERACTIVA 8 "ECUACIONES EXPONENCIALES Y LOGARÍTMICAS"</span>
         </header>
 
         <div id="viewport">
             <div class="slide-container" id="slide-container">
                 <div class="slide active">
-                    <div style="display: flex; gap: 20px; margin-bottom: 2rem;">
-                        <div
-                            style="background: #db6015; color: white; border-radius: 15px; width: 100px; height: 100px; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 2.22rem; font-weight: 800; box-shadow: 0 10px 20px rgba(219, 96, 21, 0.3);">
-                            <span>3<sup>x</sup>=27</span>
-                        </div>
-                        <div style="font-size: 80px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));">🔢</div>
-                    </div>
-                    <h1>Ecuaciones Exponenciales</h1>
+                    <div style="font-size: 80px; margin-bottom: 0.5rem;">📈</div>
+                    <h1>ECUACIONES EXPONENCIALES Y LOGARÍTMICAS</h1>
                     <h2 style="font-weight: 600;">Lección 8 &bull; 5&deg; Bachillerato</h2>
-                    <p style="color: #64748b; font-style: italic;">Resolviendo igualdades con variables en el exponente.
-                    </p>
+                    <p style="color: #64748b; font-style: italic;">Resolviendo igualdades con bases exponenciales y
+                        logaritmos.</p>
                 </div>
 
                 <div class="slide">
@@ -291,16 +285,39 @@
                 </div>
 
                 <div class="slide">
-                    <div
-                        style="background: #f0fdf4; border: 2px solid #10b981; padding: 2rem; border-radius: 20px; box-shadow: 0 10px 20px rgba(16, 185, 129, 0.1);">
-                        <h2 style="color: #10b981;">Ejemplo Paso a Paso</h2>
-                        <p style="font-weight: 600; font-size: 1.4rem; margin-bottom: 1rem;">Resolver: 3<sup>x+1</sup> =
-                            27</p>
-                        <div class="info-card" style="text-align: left; border: 2px dashed #10b981; background: white;">
-                            1. Reescribir 27 como 3&sup3;.<br>
-                            2. Igualar exponentes: x + 1 = 3.<br>
-                            3. Despejar: x = 2.
-                        </div>
+                    <h2>Ejemplo Paso a Paso</h2>
+                    <p style="font-weight: 600; font-size: 1.4rem; margin-bottom: 1rem;">Resolver: 3<sup>x+1</sup> =
+                        27</p>
+                    <div class="info-card" style="text-align: left;">
+                        1. Reescribir 27 como 3&sup3;.<br>
+                        2. Igualar exponentes: x + 1 = 3.<br>
+                        3. Despejar: x = 2.
+                    </div>
+                </div>
+
+                <!-- NEW SLIDE 1 -->
+                <div class="slide">
+                    <h2>Propiedades de los Logaritmos</h2>
+                    <p>Son herramientas esenciales para "bajar" el exponente cuando las bases no son iguales.</p>
+                    <div class="info-card">
+                        <ul style="list-style: none; padding: 0; text-align: left;">
+                            <li style="margin-bottom: 0.5rem;">📏 <strong>Producto:</strong> log(AB) = log A + log B
+                            </li>
+                            <li style="margin-bottom: 0.5rem;">📏 <strong>Cociente:</strong> log(A/B) = log A - log B
+                            </li>
+                            <li>📏 <strong>Potencia:</strong> log(A<sup>n</sup>) = n &bull; log A</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- NEW SLIDE 2 -->
+                <div class="slide">
+                    <h2>Logaritmo Natural (ln)</h2>
+                    <p>Es el logaritmo con base <strong>e</strong> (aprox. 2.718). Se usa frecuentemente en modelos de
+                        crecimiento continuo.</p>
+                    <div class="info-card">
+                        Si e<sup>x</sup> = y, entonces <strong>ln(y) = x</strong>.<br>
+                        ¡Recuerda que ln(e) = 1!
                     </div>
                 </div>
 
@@ -431,7 +448,7 @@
         <button class="nav-btn" id="next-btn" onclick="nextSlide()" aria-label="Siguiente">&#8594;</button>
 
         <div class="slide-indicators">
-            <span id="slide-num">1 / 9</span>
+            <span id="slide-num">1 / 11</span>
         </div>
         <div class="progress-bar" id="progress-bar"></div>
     </div> <!-- app-container -->
