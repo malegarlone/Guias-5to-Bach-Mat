@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía 9: Modelado y Aplicaciones - Robust v2 (Fixed)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-orange: #db6015;
+            --primary-yellow: #f7be00;
+            --primary-blue-dark: #244b5a;
+            --primary-red: #993921;
+            --bg-light: #f8fafc;
+            --transition-speed: 0.5s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e2e8f0;
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 960px;
+            height: 540px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: auto;
+        }
+
+        header {
+            background-color: var(--primary-blue-dark);
+            color: white;
+            padding: 0 1.5rem;
+            height: 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            z-index: 200;
+        }
+
+        #viewport {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        @media (max-height: 600px) or (max-width: 960px) {
+            #app-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+
+        .slide-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            padding: 30px 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.8rem;
+            color: var(--primary-orange);
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.22rem;
+            color: var(--primary-blue-dark);
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 1.2rem;
+            color: #444;
+            max-width: 700px;
+        }
+
+        .glass-card {
+            display: contents;
+        }
+
+        .info-card {
+            padding: 1.5rem;
+            border-radius: 12px;
+            background: #f0f8ff;
+            margin: 1rem 0;
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            z-index: 250;
+            border: 1px solid #ddd;
+            color: var(--primary-blue-dark);
+            font-size: 1.5rem;
+            user-select: none;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #prev-btn {
+            left: 20px;
+        }
+
+        #next-btn {
+            right: 20px;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            padding: 0;
+            bottom: 2rem;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: #888;
+            z-index: 100;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 6px;
+            background: var(--primary-orange);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            width: 100%;
+            max-width: 600px;
+            margin: 1rem auto;
+        }
+
+        .option-btn {
+            padding: 1rem 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-orange);
+            background: #fffcf9;
+        }
+
+        .tag {
+            display: none;
+        }
+
+        /* Math Styling Utilities */
+        .math-block {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', serif;
+            font-style: italic;
+            margin: 0.5rem 0;
+            gap: 4px;
+        }
+
+        .math-fraction {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            margin: 0 4px;
+        }
+
+        .math-numerator {
+            padding: 0 4px;
+            border-bottom: 2px solid currentColor;
+            width: 100%;
+            text-align: center;
+        }
+
+        .math-denominator {
+            padding: 0 4px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .math-sqrt {
+            display: inline-flex;
+            align-items: center;
+            vertical-align: middle;
+            margin: 0 2px;
+        }
+
+        .math-sqrt-symbol {
+            font-family: serif;
+            font-size: 1.3em;
+            margin-right: -2px;
+            transform: translateY(2px);
+        }
+
+        .math-radicand {
+            border-top: 2px solid currentColor;
+            padding-top: 1px;
+            line-height: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app-container">
+        <header id="global-header">
+            <span>Escolaris - Matemática 5to B</span>
+            <span>Guía 9: Modelado y Aplicaciones</span>
+        </header>
+
+        <div id="viewport">
+            <div class="slide-container" id="slide-container">
+                <div class="slide active">
+                    <div style="font-size: 80px; margin-bottom: 0.5rem;">🌍</div>
+                    <h1>Modelado y Aplicaciones</h1>
+                    <h2 style="font-weight: 600;">Lección 9 &bull; 5&deg; Bachillerato</h2>
+                    <p style="color: #64748b; font-style: italic;">Aplicando funciones al mundo real: inter&eacute;s y
+                        poblaci&oacute;n.
+                    </p>
+                </div>
+
+                <div class="slide">
+                    <div class="glass-card">
+                        <div class="tag" style="background: var(--primary-orange);">INFO 1</div>
+                        <h2>¿Por qué Modelar?</h2>
+                        <p>La naturaleza no sigue l&iacute;neas rectas. Procesos como virus, bacterias y dinero crecen
+                            de
+                            forma exponencial.</p>
+                        <div class="info-card">Un modelo es una ecuaci&oacute;n que describe c&oacute;mo cambia algo con
+                            respecto al tiempo.</div>
+                    </div>
+                </div>
+
+                <div class="slide">
+                    <h2>Interés Compuesto</h2>
+                    <p>Es el modelo financiero m&aacute;s usado. El dinero genera inter&eacute;s, y ese
+                        inter&eacute;s
+                        genera m&aacute;s inter&eacute;s.</p>
+                    <div class="info-card">
+                        <div class="math-block" style="font-size: 1.5rem;">
+                            <span>A = P(1 + </span>
+                            <div class="math-fraction">
+                                <span class="math-numerator">r</span>
+                                <span class="math-denominator">n</span>
+                            </div>
+                            <span>)<sup>nt</sup></span>
+                        </div>
+                    </div>
+                    <p>Donde P es capital, r la tasa, n periodos y t los a&ntilde;os.</p>
+                </div>
+
+                <div class="slide">
+                    <div style="font-size: 80px; margin-bottom: 0.5rem;">⏳</div>
+                    <h2>Crecimiento Continuo</h2>
+                    <p>Si el inter&eacute;s o crecimiento es instant&aacute;neo, usamos la base natural 'e'.</p>
+                    <div class="info-card" style="font-size: 1.5rem; font-weight: 800;">
+                        A = P e<sup>rt</sup>
+                    </div>
+                    <p>¡Es la f&oacute;rmula de crecimiento m&aacute;s poderosa!</p>
+                </div>
+
+                <div class="slide">
+                    <h2>Crecimiento Poblacional</h2>
+                    <p>Las poblaciones de bacterias suelen duplicarse cada cierto tiempo.</p>
+                    <div class="info-card">
+                        <div class="math-block" style="font-size: 1.5rem;">
+                            <span>N(t) = N<sub>0</sub> &middot; 2</span>
+                            <div class="math-fraction" style="font-size: 0.9rem; margin-top: -15px;">
+                                <span class="math-numerator">t</span>
+                                <span class="math-denominator">d</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p>Donde d es el tiempo de duplicaci&oacute;n.</p>
+                </div>
+
+                <div class="slide">
+                    <h2>Desintegración Radiactiva</h2>
+                    <p>Es el decaimiento de sustancias. Se usa para la dataci&oacute;n con Carbono-14.</p>
+                    <div class="info-card" style="font-size: 1.5rem; font-weight: 800;">
+                        M(t) = M<sub>0</sub> e<sup>-kt</sup>
+                    </div>
+                    <p>El exponente negativo indica que la cantidad disminuye con el tiempo.</p>
+                </div>
+
+                <div class="slide">
+                    <h2>Escalas Logarítmicas</h2>
+                    <p>Usamos logaritmos para medir cosas con rangos enormes, como los terremotos (Escala Richter) o el
+                        sonido (Decibeles).</p>
+                    <div class="info-card">
+                        Un sismo de magnitud 7 es <strong>10 veces</strong> m&aacute;s fuerte que uno de 6.
+                    </div>
+                </div>
+
+                <div class="slide">
+                    <h2>Resumen de Modelado</h2>
+                    <div class="info-card" style="text-align: left;">
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="margin-bottom: 0.8rem;">✅ <strong>Inter&eacute;s Compuesto:</strong> Permite
+                                proyectar el crecimiento del dinero en el tiempo.</li>
+                            <li style="margin-bottom: 0.8rem;">✅ <strong>Crecimiento Natural:</strong> Usa la base
+                                'e'
+                                para procesos continuos como bacterias.</li>
+                            <li style="margin-bottom: 0.8rem;">✅ <strong>Logaritmos:</strong> Son esenciales para
+                                saber
+                                cu&aacute;nto tiempo (t) toma llegar a una meta.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="slide">
+                    <h2>Finanzas</h2>
+                    <p>En la f&oacute;rmula de interés compuesto, &iquest;qu&eacute; representa la letra
+                        <strong>P</strong>?
+                    </p>
+                    <div class="quiz-container">
+                        <button class="option-btn"
+                            onclick="checkQuiz(91, false, this, 'P es el capital que se invierte al inicio.', 'Eso es la tasa (r).')">A)
+                            El porcentaje</button>
+                        <button class="option-btn"
+                            onclick="checkQuiz(91, true, this, '&iexcl;Correcto! P viene de \'Principal\', el capital inicial.', '&iexcl;Bien hecho!')">B)
+                            El capital inicial</button>
+                        <button class="option-btn"
+                            onclick="checkQuiz(91, false, this, 'P es el capital que se invierte al inicio.', 'Eso es t.')">C)
+                            El tiempo</button>
+                    </div>
+                    <div id="feedback-91" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <div class="slide">
+                    <h2>Biolog&iacute;a</h2>
+                    <p>&iquest;Qu&eacute; tipo de crecimiento describe mejor el aumento de bacterias en condiciones
+                        ideales?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn"
+                            onclick="checkQuiz(92, false, this, 'Las bacterias se duplican, eso es mucho m&aacute;s veloz que una l&iacute;nea.', 'Muy lento para bacterias.')">A)
+                            Lineal</button>
+                        <button class="option-btn"
+                            onclick="checkQuiz(92, true, this, '&iexcl;Correcto! Crecen de forma acelerada o exponencial.', '&iexcl;Exacto!')">B)
+                            Exponencial</button>
+                        <button class="option-btn"
+                            onclick="checkQuiz(92, false, this, 'Las bacterias se duplican, no se frenan como un logaritmo.', 'Eso es m&aacute;s para el decaimiento de intensidad.')">C)
+                            Logar&iacute;tmico</button>
+                    </div>
+                    <div id="feedback-92" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <div class="slide">
+                    <h2>Base Continua</h2>
+                    <p>Si una poblaci&oacute;n crece <strong>continuamente</strong>, &iquest;qu&eacute; base
+                        num&eacute;rica usamos en la f&oacute;rmula?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn"
+                            onclick="checkQuiz(93, false, this, 'Para procesos continuos naturales usamos la base de Euler.', 'Es común, pero no para lo continuo.')">A)
+                            El n&uacute;mero 10</button>
+                        <button class="option-btn"
+                            onclick="checkQuiz(93, true, this, '&iexcl;Correcto! El n&uacute;mero e (&asymp;2.718) es la base del crecimiento natural.', '&iexcl;Excelente!')">B)
+                            El n&uacute;mero e</button>
+                        <button class="option-btn"
+                            onclick="checkQuiz(93, false, this, 'Para procesos continuos naturales usamos la base de Euler.', 'Eso es para c&iacute;rculos.')">C)
+                            El n&uacute;mero Pi</button>
+                    </div>
+                    <div id="feedback-93" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <div class="slide">
+                    <h2>Reflexiona sobre tu aprendizaje</h2>
+                    <div class="info-card" style="text-align: left;">
+                        <p style="margin-bottom: 0.8rem;">🤔 &iquest;Por qu&eacute; crees que entender el
+                            inter&eacute;s
+                            compuesto es vital para tu futuro?</p>
+                        <p style="margin-bottom: 0.8rem;">❓ &iquest;Qu&eacute; diferencia principal ves entre un
+                            modelo
+                            lineal y uno exponencial?</p>
+                        <p style="margin-bottom: 0.8rem;">💡 &iquest;Qu&eacute; otro fen&oacute;meno de la vida real
+                            podr&iacute;as modelar con estas f&oacute;rmulas?</p>
+                    </div>
+                </div>
+
+                <div class="slide">
+                    <div style="font-size: 80px;">🎯</div>
+                    <h2>&iexcl;Analista Global!</h2>
+                    <p>Has aprendido a predecir el comportamiento de variables en el mundo real.</p>
+                    <button onclick="goToSlide(0)"
+                        style="background: var(--primary-orange); color: white; border: none; padding: 1rem 2rem; border-radius: 30px; font-weight: 700; cursor: pointer;">Reiniciar
+                        Gu&iacute;a</button>
+                </div>
+            </div>
+
+            <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled aria-label="Anterior">&#8592;</button>
+            <button class="nav-btn" id="next-btn" onclick="nextSlide()" aria-label="Siguiente">&#8594;</button>
+
+            <div class="slide-indicators">
+                <span id="slide-num">1 / 11</span>
+            </div>
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <script>
+            let currentSlide = 0;
+            const slides = document.querySelectorAll('.slide');
+            const container = document.getElementById('slide-container');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const slideNum = document.getElementById('slide-num');
+            const progressBar = document.getElementById('progress-bar');
+            function updateGallery() {
+                container.style.transform = `translateX(-${currentSlide * 100}%)`;
+                slides.forEach((slide, index) => slide.classList.toggle('active', index === currentSlide));
+                prevBtn.disabled = currentSlide === 0;
+                nextBtn.disabled = currentSlide === slides.length - 1;
+                slideNum.innerText = `${currentSlide + 1} / ${slides.length}`;
+                progressBar.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+            }
+            function nextSlide() { if (currentSlide < slides.length - 1) { currentSlide++; updateGallery(); } }
+            function prevSlide() { if (currentSlide > 0) { currentSlide--; updateGallery(); } }
+            function goToSlide(n) { currentSlide = n; updateGallery(); }
+            document.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === ' ') nextSlide(); if (e.key === 'ArrowLeft') prevSlide(); });
+            let touchStartX = 0;
+            document.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX, false);
+            document.addEventListener('touchend', e => {
+                let touchEndX = e.changedTouches[0].screenX;
+                if (touchEndX < touchStartX - 40) nextSlide();
+                if (touchEndX > touchStartX + 40) prevSlide();
+            }, false);
+            function checkQuiz(qId, isCorrect, btn, correctMsg, incorrectMsg) {
+                const feedback = document.getElementById(`feedback-${qId}`);
+                const container = btn.parentElement;
+
+                if (isCorrect) {
+                    container.querySelectorAll('.option-btn').forEach(b => {
+                        b.disabled = true;
+                        b.style.opacity = "0.5";
+                    });
+                    btn.disabled = false;
+                    btn.style.opacity = "1";
+                    btn.style.background = "#ecfdf5";
+                    btn.style.borderColor = "#10b981";
+                    feedback.innerHTML = `&iexcl;Correcto! ${correctMsg}`;
+                    feedback.style.color = "#10b981";
+                } else {
+                    btn.style.background = "#fff5f5";
+                    btn.style.borderColor = "#993921";
+                    btn.disabled = true;
+                    feedback.innerHTML = `<span>${incorrectMsg}</span> <button onclick="resetQuiz(${qId}, '${correctMsg}', '${incorrectMsg}')" style="margin-left:10px; background:var(--primary-blue-dark); color:white; border:none; padding:4px 10px; border-radius:15px; cursor:pointer; font-size:0.8rem;">Reintentar</button>`;
+                    feedback.style.color = "#993921";
+                }
+            }
+
+            function resetQuiz(qId, cMsg, iMsg) {
+                const feedback = document.getElementById(`feedback-${qId}`);
+                const container = feedback.parentElement.querySelector('.quiz-container');
+                container.querySelectorAll('.option-btn').forEach(b => {
+                    b.disabled = false;
+                    b.style.opacity = "1";
+                    b.style.background = "white";
+                    b.style.borderColor = "#e2e8f0";
+                });
+                feedback.innerHTML = "";
+            }
+            updateGallery();
+        </script>
+</body>
+
+</html>
