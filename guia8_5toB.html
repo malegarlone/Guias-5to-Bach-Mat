@@ -39,12 +39,45 @@
             overflow: hidden;
         }
 
+        #app-container {
+            width: 100%;
+            max-width: 960px;
+            height: 540px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: auto;
+        }
+
+        header {
+            background-color: var(--primary-blue-dark);
+            color: white;
+            padding: 0 1.5rem;
+            height: 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            z-index: 200;
+        }
+
         #viewport {
             flex: 1;
             position: relative;
             width: 100%;
             overflow: hidden;
             background: #ffffff;
+        }
+
+        @media (max-height: 600px) or (max-width: 960px) {
+            #app-container {
+                height: 100vh;
+                border-radius: 0;
+            }
         }
 
         .slide-container {
@@ -448,7 +481,7 @@
         <button class="nav-btn" id="next-btn" onclick="nextSlide()" aria-label="Siguiente">&#8594;</button>
 
         <div class="slide-indicators">
-            <span id="slide-num">1 / 11</span>
+            <span id="slide-num">1 / 13</span>
         </div>
         <div class="progress-bar" id="progress-bar"></div>
     </div> <!-- app-container -->
