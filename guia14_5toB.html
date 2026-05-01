@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía 14: Matrices - 5to Bachillerato</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary-blue: #1e3a8a;
+            --primary-gold: #b45309;
+            --primary-teal: #0f766e;
+            --primary-slate: #334155;
+            --accent-red: #be123c;
+            --bg-light: #f8fafc;
+            --transition-speed: 0.5s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #cbd5e1;
+            color: #0f172a;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 1024px;
+            height: 600px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: auto;
+        }
+
+        header {
+            background-color: var(--primary-slate);
+            color: white;
+            padding: 0 1.5rem;
+            height: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+            font-weight: 500;
+            z-index: 200;
+            letter-spacing: 0.5px;
+        }
+
+        #viewport {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        @media (max-height: 650px) or (max-width: 1024px) {
+            #app-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+
+        .slide-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            padding: 30px 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.8rem;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.1rem;
+            color: var(--primary-teal);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            border-bottom: 2px solid var(--bg-light);
+            padding-bottom: 5px;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: #334155;
+            max-width: 850px;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .info-card {
+            padding: 1.5rem;
+            border-radius: 8px;
+            background: #f1f5f9;
+            margin: 1rem 0;
+            width: 100%;
+            max-width: 800px;
+            text-align: left;
+            border-left: 5px solid var(--primary-blue);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .math-block {
+            font-family: 'Cambria Math', 'Times New Roman', serif;
+            font-size: 1.5rem;
+            margin: 15px 0;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease;
+            z-index: 250;
+            border: 1px solid #e2e8f0;
+            color: var(--primary-slate);
+            font-size: 1.5rem;
+            user-select: none;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-50%) scale(1.1);
+            background-color: #f8fafc;
+            color: var(--primary-blue);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #prev-btn {
+            left: 20px;
+        }
+
+        #next-btn {
+            right: 20px;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            padding: 0;
+            bottom: 2rem;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: #64748b;
+            z-index: 100;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 6px;
+            background: var(--primary-gold);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            width: 100%;
+            max-width: 650px;
+            margin: 1rem auto;
+        }
+
+        .option-btn {
+            padding: 1rem 1.5rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            color: var(--primary-slate);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-blue);
+            background: #f0f9ff;
+        }
+        
+        .grid-types {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 800px;
+            margin-top: 15px;
+        }
+        
+        .type-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="app-container">
+        <header id="global-header">
+            <span>Colegio Escolaris - Matemática 5to Bachillerato</span>
+            <span>Lección 14: Introducción a las Matrices</span>
+        </header>
+
+        <div id="viewport">
+            <div class="slide-container" id="slide-container">
+                
+                <!-- 1. Portada -->
+                <div class="slide active">
+                    <div style="font-size: 4rem; margin-bottom: 20px; color: var(--primary-teal);">🧮</div>
+                    <h1>Fundamentos de Álgebra Lineal</h1>
+                    <h2>Introducción a las Matrices</h2>
+                    <p style="text-align: center; color: #64748b; font-size: 1.2rem;">El lenguaje en el que las computadoras procesan gráficas, videojuegos e inteligencia artificial.</p>
+                </div>
+
+                <!-- 2. Definición -->
+                <div class="slide">
+                    <h2>¿Qué es una Matriz?</h2>
+                    <p>Una matriz es simplemente un <strong>arreglo rectangular de números</strong>, organizados en filas horizontales y columnas verticales, encerrados en corchetes o paréntesis.</p>
+                    
+                    <div class="math-block" style="border-color: var(--primary-blue);">
+                        \( A = \begin{bmatrix} 5 & -2 & 9 \\ 0 & 4 & 1 \end{bmatrix} \)
+                    </div>
+                    
+                    <div class="info-card" style="border-color: var(--primary-gold); background: #fffbeb;">
+                        <ul style="margin-left: 20px; line-height: 1.8;">
+                            <li><strong style="color: var(--accent-red);">Filas:</strong> Van de izquierda a derecha. (Esta matriz tiene 2 filas).</li>
+                            <li><strong style="color: var(--primary-teal);">Columnas:</strong> Van de arriba hacia abajo. (Esta matriz tiene 3 columnas).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 3. Dimensión -->
+                <div class="slide">
+                    <h2>Dimensión de una Matriz</h2>
+                    <p>La dimensión (u orden) de una matriz siempre se escribe como <strong>\( \text{filas} \times \text{columnas} \)</strong> (\( m \times n \)).</p>
+                    
+                    <div style="font-size: 2rem; font-family: 'Cambria Math', serif; color: var(--primary-slate); margin: 20px 0;">
+                        \( \mathbf{m \times n} \)
+                    </div>
+                    
+                    <p style="font-size: 1.2rem;">Nuestra matriz de ejemplo:</p>
+                    <div class="math-block">
+                        \( A = \begin{bmatrix} 5 & -2 & 9 \\ 0 & 4 & 1 \end{bmatrix} \)
+                    </div>
+                    <p style="color: var(--primary-blue); font-weight: bold; font-size: 1.2rem;">¡Es una matriz de dimensión \( 2 \times 3 \)!</p>
+                </div>
+
+                <!-- 4. Elementos -->
+                <div class="slide">
+                    <h2>Coordenadas de los Elementos (\( a_{ij} \))</h2>
+                    <p>Cada número dentro de la matriz tiene una "dirección" exacta. Se usa la letra minúscula con dos subíndices: el primero indica su fila y el segundo su columna.</p>
+                    
+                    <div class="math-block" style="border-color: var(--primary-teal); background: #f0fdfa;">
+                        \( A = \begin{bmatrix} a_{11} & a_{12} & \mathbf{a_{13}} \\ a_{21} & a_{22} & a_{23} \end{bmatrix} \)
+                    </div>
+                    
+                    <div class="info-card">
+                        <p style="margin-bottom: 10px;">En nuestra matriz numérica \( A = \begin{bmatrix} 5 & -2 & 9 \\ 0 & 4 & 1 \end{bmatrix} \):</p>
+                        <ul style="margin-left: 20px; line-height: 1.8;">
+                            <li>\( a_{11} = 5 \) (Fila 1, Columna 1)</li>
+                            <li><strong>\( a_{13} = 9 \)</strong> (Fila 1, Columna 3)</li>
+                            <li>\( a_{22} = 4 \) (Fila 2, Columna 2)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 5. Tipos de Matrices -->
+                <div class="slide">
+                    <h2>Tipos Especiales de Matrices</h2>
+                    
+                    <div class="grid-types">
+                        <div class="type-card">
+                            <h3 style="color: var(--primary-blue); margin-bottom: 10px; font-size: 1.1rem;">Matriz Cuadrada</h3>
+                            <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 10px;">Mismo número de filas y columnas (ej. \( 2 \times 2 \)).</p>
+                            <div class="math-block" style="font-size: 1.2rem; margin:0; padding:10px;">\( \begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix} \)</div>
+                        </div>
+                        
+                        <div class="type-card">
+                            <h3 style="color: var(--primary-teal); margin-bottom: 10px; font-size: 1.1rem;">Matriz Fila / Columna</h3>
+                            <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 10px;">Solo 1 fila (vector fila) o solo 1 columna (vector columna).</p>
+                            <div class="math-block" style="font-size: 1.2rem; margin:0; padding:10px;">\( \begin{bmatrix} 7 \\ -2 \\ 5 \end{bmatrix} \)</div>
+                        </div>
+                        
+                        <div class="type-card">
+                            <h3 style="color: var(--accent-red); margin-bottom: 10px; font-size: 1.1rem;">Matriz Nula</h3>
+                            <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 10px;">Todos sus elementos son cero.</p>
+                            <div class="math-block" style="font-size: 1.2rem; margin:0; padding:10px;">\( \begin{bmatrix} 0 & 0 \\ 0 & 0 \\ 0 & 0 \end{bmatrix} \)</div>
+                        </div>
+                        
+                        <div class="type-card">
+                            <h3 style="color: var(--primary-gold); margin-bottom: 10px; font-size: 1.1rem;">Matriz Identidad (\( I \))</h3>
+                            <p style="font-size: 0.9rem; color: #64748b; margin-bottom: 10px;">Es cuadrada, con "1" en la diagonal principal y "0" en el resto. ¡Es como el número 1 de las matrices!</p>
+                            <div class="math-block" style="font-size: 1.2rem; margin:0; padding:10px;">\( \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} \)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. QUIZ 1 -->
+                <div class="slide">
+                    <h2>Quiz 1: Dimensión</h2>
+                    <p>¿Cuál es la dimensión de la siguiente matriz?</p>
+                    <div class="math-block">\( B = \begin{bmatrix} 4 & 0 & -1 & 5 \\ 3 & 2 & 8 & 9 \end{bmatrix} \)</div>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'Al revés. Recuerda que siempre se cuenta primero la cantidad de filas (horizontales).')">A) \( 4 \times 2 \)</button>
+                        <button class="option-btn" onclick="checkQuiz(1, true, this, '¡Correcto! Tiene 2 filas horizontales y 4 columnas verticales.', '')">B) \( 2 \times 4 \)</button>
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'Eso sería el total de elementos, pero la dimensión se expresa separada por un signo por (x).')">C) \( 8 \)</button>
+                    </div>
+                    <div id="feedback-1" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 7. QUIZ 2 -->
+                <div class="slide">
+                    <h2>Quiz 2: Coordenadas</h2>
+                    <p>Observando la matriz \( B \), ¿cuál es el valor del elemento <strong>\( b_{23} \)</strong>?</p>
+                    <div class="math-block">\( B = \begin{bmatrix} 4 & 0 & -1 & 5 \\ 3 & 2 & 8 & 9 \end{bmatrix} \)</div>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'El subíndice 23 significa Fila 2, Columna 3. El número -1 está en la Fila 1.')">A) \( -1 \)</button>
+                        <button class="option-btn" onclick="checkQuiz(2, true, this, '¡Excelente! En la segunda fila y tercera columna se encuentra el número 8.', '')">B) \( 8 \)</button>
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'El número 2 está en la Fila 2, Columna 2 (b_22).')">C) \( 2 \)</button>
+                    </div>
+                    <div id="feedback-2" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 8. QUIZ 3 -->
+                <div class="slide">
+                    <h2>Quiz 3: Identidad</h2>
+                    <p>¿Qué característica hace que una matriz sea la Matriz Identidad (\( I \))?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'Esa sería la Matriz Nula.')">A) Todos sus números son cero.</button>
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'Es importante que sea cuadrada, pero no basta solo con eso. Los números internos deben seguir un patrón.')">B) Es cuadrada y tiene los mismos números en todas las celdas.</button>
+                        <button class="option-btn" onclick="checkQuiz(3, true, this, '¡Perfecto! Unos en la diagonal que baja de izquierda a derecha, y ceros en el resto.', '')">C) Es cuadrada, tiene '1's en la diagonal principal y '0's en todos los demás espacios.</button>
+                    </div>
+                    <div id="feedback-3" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+            </div> <!-- slide-container -->
+        </div> <!-- viewport -->
+
+        <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled aria-label="Anterior">&#8592;</button>
+        <button class="nav-btn" id="next-btn" onclick="nextSlide()" aria-label="Siguiente">&#8594;</button>
+
+        <div class="slide-indicators">
+            <span id="slide-num">1 / 8</span>
+        </div>
+        <div class="progress-bar" id="progress-bar"></div>
+    </div> <!-- app-container -->
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const container = document.getElementById('slide-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const slideNum = document.getElementById('slide-num');
+        const progressBar = document.getElementById('progress-bar');
+
+        function updateGallery() {
+            container.style.transform = `translateX(-${currentSlide * 100}%)`;
+            slides.forEach((slide, index) => slide.classList.toggle('active', index === currentSlide));
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+            slideNum.innerText = `${currentSlide + 1} / ${slides.length}`;
+            progressBar.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+            
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        function nextSlide() { if (currentSlide < slides.length - 1) { currentSlide++; updateGallery(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateGallery(); } }
+
+        document.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === ' ') nextSlide(); if (e.key === 'ArrowLeft') prevSlide(); });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX, false);
+        document.addEventListener('touchend', e => {
+            let touchEndX = e.changedTouches[0].screenX;
+            if (touchEndX < touchStartX - 40) nextSlide();
+            if (touchEndX > touchStartX + 40) prevSlide();
+        }, false);
+
+        function checkQuiz(qId, isCorrect, btn, correctMsg, incorrectMsg) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const container = btn.parentElement;
+
+            if (isCorrect) {
+                container.querySelectorAll('.option-btn').forEach(b => {
+                    b.disabled = true;
+                    b.style.opacity = "0.5";
+                });
+                btn.disabled = false;
+                btn.style.opacity = "1";
+                btn.style.background = "#dcfce7";
+                btn.style.borderColor = "#059669";
+                btn.style.color = "#065f46";
+                feedback.innerHTML = `✅ &iexcl;Correcto! ${correctMsg}`;
+                feedback.style.color = "#059669";
+            } else {
+                btn.style.background = "#fee2e2";
+                btn.style.borderColor = "#e11d48";
+                btn.style.color = "#9f1239";
+                btn.disabled = true;
+                feedback.innerHTML = `❌ <span>${incorrectMsg}</span> <button onclick="resetQuiz(${qId})" style="margin-left:10px; background:var(--primary-slate); color:white; border:none; padding:5px 12px; border-radius:6px; cursor:pointer; font-size:0.85rem;">Reintentar</button>`;
+                feedback.style.color = "#e11d48";
+            }
+        }
+
+        function resetQuiz(qId) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const container = feedback.parentElement.querySelector('.quiz-container');
+            container.querySelectorAll('.option-btn').forEach(b => {
+                b.disabled = false;
+                b.style.opacity = "1";
+                b.style.background = "white";
+                b.style.borderColor = "#cbd5e1";
+                b.style.color = "var(--primary-slate)";
+            });
+            feedback.innerHTML = "";
+        }
+
+        updateGallery();
+    </script>
+</body>
+
+</html>

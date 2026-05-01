@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía 13: Modelado Polinomial - 5to Bachillerato</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary-blue: #1e3a8a;
+            --primary-gold: #b45309;
+            --primary-teal: #0f766e;
+            --primary-slate: #334155;
+            --accent-red: #be123c;
+            --bg-light: #f8fafc;
+            --transition-speed: 0.5s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #cbd5e1;
+            color: #0f172a;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 1024px;
+            height: 600px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: auto;
+        }
+
+        header {
+            background-color: var(--primary-slate);
+            color: white;
+            padding: 0 1.5rem;
+            height: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+            font-weight: 500;
+            z-index: 200;
+            letter-spacing: 0.5px;
+        }
+
+        #viewport {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        @media (max-height: 650px) or (max-width: 1024px) {
+            #app-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+
+        .slide-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            padding: 30px 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.8rem;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.1rem;
+            color: var(--primary-teal);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            border-bottom: 2px solid var(--bg-light);
+            padding-bottom: 5px;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: #334155;
+            max-width: 850px;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .info-card {
+            padding: 1.5rem;
+            border-radius: 8px;
+            background: #f1f5f9;
+            margin: 1rem 0;
+            width: 100%;
+            max-width: 800px;
+            text-align: left;
+            border-left: 5px solid var(--primary-blue);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .math-block {
+            font-family: 'Cambria Math', 'Times New Roman', serif;
+            font-size: 1.5rem;
+            margin: 15px 0;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease;
+            z-index: 250;
+            border: 1px solid #e2e8f0;
+            color: var(--primary-slate);
+            font-size: 1.5rem;
+            user-select: none;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-50%) scale(1.1);
+            background-color: #f8fafc;
+            color: var(--primary-blue);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #prev-btn {
+            left: 20px;
+        }
+
+        #next-btn {
+            right: 20px;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            padding: 0;
+            bottom: 2rem;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: #64748b;
+            z-index: 100;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 6px;
+            background: var(--primary-gold);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            width: 100%;
+            max-width: 650px;
+            margin: 1rem auto;
+        }
+
+        .option-btn {
+            padding: 1rem 1.5rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            color: var(--primary-slate);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-blue);
+            background: #f0f9ff;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="app-container">
+        <header id="global-header">
+            <span>Colegio Escolaris - Matemática 5to Bachillerato</span>
+            <span>Lección 13: Modelado Polinomial</span>
+        </header>
+
+        <div id="viewport">
+            <div class="slide-container" id="slide-container">
+                
+                <!-- 1. Portada -->
+                <div class="slide active">
+                    <div style="font-size: 4rem; margin-bottom: 20px; color: var(--primary-gold);">📉✍️</div>
+                    <h1>Ingeniería Inversa</h1>
+                    <h2>Modelado de Funciones Polinomiales</h2>
+                    <p style="text-align: center; color: #64748b; font-size: 1.2rem;">¿Puedes reconstruir la ecuación entera de un polinomio conociendo solo algunos de sus puntos clave?</p>
+                </div>
+
+                <!-- 2. La Forma Factorizada -->
+                <div class="slide">
+                    <h2>La Forma Factorizada</h2>
+                    <p>Cualquier polinomio se puede escribir como una multiplicación de "factores" creados a partir de sus ceros (o raíces).</p>
+                    
+                    <div class="math-block" style="border-color: var(--primary-teal); font-size: 1.6rem;">
+                        \( f(x) = \mathbf{a}(x - r_1)(x - r_2)\dots(x - r_n) \)
+                    </div>
+                    
+                    <ul style="text-align: left; max-width: 700px; font-size: 1.15rem; line-height: 1.8; margin-top: 15px;">
+                        <li>\( r_1, r_2 \dots \) son los ceros (los valores donde la gráfica cruza el eje X).</li>
+                        <li><strong>\( a \)</strong> es un número escalar. Si cambiamos \( a \), la gráfica se estira o se encoge, pero sigue pasando por los mismos ceros.</li>
+                    </ul>
+                </div>
+
+                <!-- 3. Planteamiento del Problema -->
+                <div class="slide">
+                    <h2>Problema de Modelado</h2>
+                    <div class="info-card" style="border-color: var(--primary-gold); background: #fffbeb;">
+                        <p style="font-style: italic; font-size: 1.2rem; text-align: center;">"Encuentra un polinomio de grado 3 que tenga ceros en \( x = 1 \), \( x = -2 \) y \( x = 3 \), y que además cruce el eje Y en el punto \( (0, 12) \)."</p>
+                    </div>
+                    
+                    <p style="margin-top: 20px;"><strong>Paso 1: Armar los factores con los ceros dados.</strong><br>
+                    Recuerda que si el cero es \( c \), el factor es \( (x - c) \).</p>
+                    
+                    <div class="math-block" style="margin-top: 10px;">
+                        \( f(x) = a(x - 1)(x - (-2))(x - 3) \)
+                    </div>
+                    <div class="math-block" style="border-color: var(--primary-blue); margin-top: 0;">
+                        \( f(x) = a(x - 1)(x + 2)(x - 3) \)
+                    </div>
+                </div>
+
+                <!-- 4. Resolviendo 'a' (Parte 1) -->
+                <div class="slide">
+                    <h2>Encontrando el valor de 'a'</h2>
+                    <p>Tenemos la ecuación \( f(x) = a(x - 1)(x + 2)(x - 3) \), pero aún no conocemos el valor de \( a \). Para eso nos dieron el punto extra: <strong>\( (0, 12) \)</strong>.</p>
+                    
+                    <div class="info-card" style="border-color: var(--primary-teal); background: #f0fdfa;">
+                        <p>Esto significa que cuando <strong>\( x = 0 \)</strong>, la función <strong>\( f(x) = 12 \)</strong>.</p>
+                        <p style="margin-top: 10px;">Sustituimos estos valores en nuestra ecuación:</p>
+                        <div style="font-family: 'Cambria Math', serif; font-size: 1.4rem; margin-top: 15px; text-align: center;">
+                            \( \mathbf{12} = a(\mathbf{0} - 1)(\mathbf{0} + 2)(\mathbf{0} - 3) \)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Resolviendo 'a' (Parte 2) -->
+                <div class="slide">
+                    <h2>Despejando la Ecuación</h2>
+                    <p>Ahora resolvemos la multiplicación para despejar \( a \).</p>
+                    
+                    <div style="text-align: left; max-width: 400px; line-height: 2; font-size: 1.2rem;">
+                        <p>\( 12 = a(-1)(2)(-3) \)</p>
+                        <p>\( 12 = a(6) \)</p>
+                        <p>\( a = \frac{12}{6} \)</p>
+                        <p style="font-size: 1.4rem; color: var(--primary-blue); font-weight: bold;">\( a = 2 \)</p>
+                    </div>
+                    
+                    <div class="info-card" style="margin-top: 20px;">
+                        <p style="margin-bottom: 5px;"><strong>¡La Ecuación Final del Polinomio es!</strong></p>
+                        <div class="math-block" style="border:none; background: transparent; margin:0; padding:0;">
+                            <span style="color: var(--accent-red); font-weight: bold;">\( f(x) = 2(x - 1)(x + 2)(x - 3) \)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. QUIZ 1 -->
+                <div class="slide">
+                    <h2>Quiz 1: Construcción de Factores</h2>
+                    <p>Si te dicen que una función polinomial cruza el eje X exactamente en \( x = 5 \), ¿cuál de los siguientes es un factor de esa función?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'Recuerda la fórmula: el factor es (x - cero). Si el cero es 5 positivo, el factor será negativo.')">A) \( (x + 5) \)</button>
+                        <button class="option-btn" onclick="checkQuiz(1, true, this, '¡Correcto! El factor siempre tiene el signo opuesto al cero de la gráfica: (x - 5).', '')">B) \( (x - 5) \)</button>
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'El cero está en X, por lo que pertenece al dominio. No tiene sentido poner un número fijo menos X de esta forma.')">C) \( (5 - x) \)</button>
+                    </div>
+                    <div id="feedback-1" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 7. QUIZ 2 -->
+                <div class="slide">
+                    <h2>Quiz 2: El Propósito de 'a'</h2>
+                    <p>En la forma factorizada \( f(x) = a(x-r_1)(x-r_2) \), ¿para qué necesitamos calcular el valor del escalar "a"?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'Las raíces ya nos las dan los números r1 y r2, el escalar a no cambia en dónde cruza el eje X.')">A) Para encontrar nuevas raíces de la función.</button>
+                        <button class="option-btn" onclick="checkQuiz(2, true, this, '¡Perfecto! El escalar 'a' define la amplitud. Hay infinitas parábolas que cruzan por los mismos ceros, 'a' selecciona la correcta ajustándola a un punto extra.', '')">B) Para ajustar qué tan estirada o comprimida está la gráfica para que pase exactamente por un punto específico extra.</button>
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'La asíntota depende de los denominadores (si fuera una función racional), no de este escalar.')">C) Para determinar dónde está la asíntota horizontal.</button>
+                    </div>
+                    <div id="feedback-2" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 8. QUIZ 3 -->
+                <div class="slide">
+                    <h2>Quiz 3: Evaluación Simple</h2>
+                    <p>Dada la función \( f(x) = 3(x - 2)(x + 1) \). Si evaluamos la función en \( x = 0 \) para encontrar el intercepto en Y, ¿cuál es el resultado?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', '3 por (-2) por (1) no da cero.')">A) \( 0 \)</button>
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'Te faltó considerar el signo de la multiplicación: 3 * (-2) * (1).')">B) \( 6 \)</button>
+                        <button class="option-btn" onclick="checkQuiz(3, true, this, '¡Exacto! 3 * (0 - 2) * (0 + 1) = 3 * (-2) * (1) = -6.', '')">C) \( -6 \)</button>
+                    </div>
+                    <div id="feedback-3" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+            </div> <!-- slide-container -->
+        </div> <!-- viewport -->
+
+        <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled aria-label="Anterior">&#8592;</button>
+        <button class="nav-btn" id="next-btn" onclick="nextSlide()" aria-label="Siguiente">&#8594;</button>
+
+        <div class="slide-indicators">
+            <span id="slide-num">1 / 8</span>
+        </div>
+        <div class="progress-bar" id="progress-bar"></div>
+    </div> <!-- app-container -->
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const container = document.getElementById('slide-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const slideNum = document.getElementById('slide-num');
+        const progressBar = document.getElementById('progress-bar');
+
+        function updateGallery() {
+            container.style.transform = `translateX(-${currentSlide * 100}%)`;
+            slides.forEach((slide, index) => slide.classList.toggle('active', index === currentSlide));
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+            slideNum.innerText = `${currentSlide + 1} / ${slides.length}`;
+            progressBar.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+            
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        function nextSlide() { if (currentSlide < slides.length - 1) { currentSlide++; updateGallery(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateGallery(); } }
+
+        document.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === ' ') nextSlide(); if (e.key === 'ArrowLeft') prevSlide(); });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX, false);
+        document.addEventListener('touchend', e => {
+            let touchEndX = e.changedTouches[0].screenX;
+            if (touchEndX < touchStartX - 40) nextSlide();
+            if (touchEndX > touchStartX + 40) prevSlide();
+        }, false);
+
+        function checkQuiz(qId, isCorrect, btn, correctMsg, incorrectMsg) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const container = btn.parentElement;
+
+            if (isCorrect) {
+                container.querySelectorAll('.option-btn').forEach(b => {
+                    b.disabled = true;
+                    b.style.opacity = "0.5";
+                });
+                btn.disabled = false;
+                btn.style.opacity = "1";
+                btn.style.background = "#dcfce7";
+                btn.style.borderColor = "#059669";
+                btn.style.color = "#065f46";
+                feedback.innerHTML = `✅ &iexcl;Correcto! ${correctMsg}`;
+                feedback.style.color = "#059669";
+            } else {
+                btn.style.background = "#fee2e2";
+                btn.style.borderColor = "#e11d48";
+                btn.style.color = "#9f1239";
+                btn.disabled = true;
+                feedback.innerHTML = `❌ <span>${incorrectMsg}</span> <button onclick="resetQuiz(${qId})" style="margin-left:10px; background:var(--primary-slate); color:white; border:none; padding:5px 12px; border-radius:6px; cursor:pointer; font-size:0.85rem;">Reintentar</button>`;
+                feedback.style.color = "#e11d48";
+            }
+        }
+
+        function resetQuiz(qId) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const container = feedback.parentElement.querySelector('.quiz-container');
+            container.querySelectorAll('.option-btn').forEach(b => {
+                b.disabled = false;
+                b.style.opacity = "1";
+                b.style.background = "white";
+                b.style.borderColor = "#cbd5e1";
+                b.style.color = "var(--primary-slate)";
+            });
+            feedback.innerHTML = "";
+        }
+
+        updateGallery();
+    </script>
+</body>
+
+</html>

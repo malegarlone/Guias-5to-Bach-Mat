@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía 15: Suma y Resta de Matrices - 5to Bachillerato</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;700&display=swap"
+        rel="stylesheet">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary-blue: #1e3a8a;
+            --primary-gold: #b45309;
+            --primary-teal: #0f766e;
+            --primary-slate: #334155;
+            --accent-red: #be123c;
+            --bg-light: #f8fafc;
+            --transition-speed: 0.5s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #cbd5e1;
+            color: #0f172a;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 1024px;
+            height: 600px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: auto;
+        }
+
+        header {
+            background-color: var(--primary-slate);
+            color: white;
+            padding: 0 1.5rem;
+            height: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+            font-weight: 500;
+            z-index: 200;
+            letter-spacing: 0.5px;
+        }
+
+        #viewport {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        @media (max-height: 650px) or (max-width: 1024px) {
+            #app-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+
+        .slide-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            padding: 30px 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.8rem;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.1rem;
+            color: var(--primary-teal);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+            border-bottom: 2px solid var(--bg-light);
+            padding-bottom: 5px;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: #334155;
+            max-width: 850px;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .info-card {
+            padding: 1.5rem;
+            border-radius: 8px;
+            background: #f1f5f9;
+            margin: 1rem 0;
+            width: 100%;
+            max-width: 800px;
+            text-align: left;
+            border-left: 5px solid var(--primary-blue);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .math-block {
+            font-family: 'Cambria Math', 'Times New Roman', serif;
+            font-size: 1.5rem;
+            margin: 15px 0;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease;
+            z-index: 250;
+            border: 1px solid #e2e8f0;
+            color: var(--primary-slate);
+            font-size: 1.5rem;
+            user-select: none;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-50%) scale(1.1);
+            background-color: #f8fafc;
+            color: var(--primary-blue);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #prev-btn {
+            left: 20px;
+        }
+
+        #next-btn {
+            right: 20px;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            padding: 0;
+            bottom: 2rem;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: #64748b;
+            z-index: 100;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 6px;
+            background: var(--primary-gold);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            width: 100%;
+            max-width: 650px;
+            margin: 1rem auto;
+        }
+
+        .option-btn {
+            padding: 1rem 1.5rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            color: var(--primary-slate);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-blue);
+            background: #f0f9ff;
+        }
+        
+        .flex-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="app-container">
+        <header id="global-header">
+            <span>Colegio Escolaris - Matemática 5to Bachillerato</span>
+            <span>Lección 15: Suma y Resta Matricial</span>
+        </header>
+
+        <div id="viewport">
+            <div class="slide-container" id="slide-container">
+                
+                <!-- 1. Portada -->
+                <div class="slide active">
+                    <div style="font-size: 4rem; margin-bottom: 20px; color: var(--primary-blue);">➕➖</div>
+                    <h1>Suma y Resta de Matrices</h1>
+                    <h2>El juego de las coordenadas exactas</h2>
+                    <p style="text-align: center; color: #64748b; font-size: 1.2rem;">Aprende a combinar grandes bloques de información numérica bajo reglas estrictas.</p>
+                </div>
+
+                <!-- 2. La Regla de Oro -->
+                <div class="slide">
+                    <h2>La Regla de Oro</h2>
+                    <p>Las matrices no son números normales. Son estructuras rígidas. Por eso, para poder sumar o restar dos matrices, deben cumplir una condición irrompible:</p>
+                    
+                    <div class="info-card" style="border-color: var(--accent-red); background: #fff1f2;">
+                        <p style="text-align: center; font-weight: bold; font-size: 1.3rem; color: var(--accent-red); margin: 0;">¡Tienen que tener EXACTAMENTE la misma dimensión!</p>
+                    </div>
+                    
+                    <ul style="text-align: left; max-width: 650px; font-size: 1.1rem; line-height: 1.8; margin-top: 20px;">
+                        <li>Una matriz \( 2 \times 3 \) solo se puede sumar con otra matriz \( 2 \times 3 \).</li>
+                        <li>Una matriz \( 3 \times 1 \) solo se puede restar con otra matriz \( 3 \times 1 \).</li>
+                    </ul>
+                    <p style="margin-top: 15px; color: var(--primary-teal); font-weight: bold;">Si tienen dimensiones distintas, la operación es "No Definida".</p>
+                </div>
+
+                <!-- 3. Ejemplo de Suma -->
+                <div class="slide">
+                    <h2>Ejemplo de Suma: Paso a Paso</h2>
+                    <p>Para sumar, simplemente tomamos cada elemento de la Matriz A y le sumamos el elemento que está en su <strong>misma posición exacta</strong> en la Matriz B.</p>
+                    
+                    <div class="flex-container">
+                        <div class="math-block" style="border-color: var(--primary-blue);">
+                            \( \begin{bmatrix} \color{var(--primary-teal)}{2} & 5 \\ -1 & \color{var(--primary-gold)}{4} \end{bmatrix} \)
+                        </div>
+                        <div style="font-size: 2rem; font-weight: bold;">+</div>
+                        <div class="math-block" style="border-color: var(--primary-blue);">
+                            \( \begin{bmatrix} \color{var(--primary-teal)}{6} & -3 \\ 2 & \color{var(--primary-gold)}{1} \end{bmatrix} \)
+                        </div>
+                        <div style="font-size: 2rem; font-weight: bold;">=</div>
+                        <div class="math-block" style="border-color: var(--primary-teal); background: #f0fdfa;">
+                            \( \begin{bmatrix} \color{var(--primary-teal)}{2+6} & 5+(-3) \\ -1+2 & \color{var(--primary-gold)}{4+1} \end{bmatrix} \)
+                        </div>
+                    </div>
+                    
+                    <div class="math-block" style="margin-top: 20px; font-weight: bold;">
+                        Resultado: \( \begin{bmatrix} 8 & 2 \\ 1 & 5 \end{bmatrix} \)
+                    </div>
+                </div>
+
+                <!-- 4. Ejemplo de Resta -->
+                <div class="slide">
+                    <h2>Ejemplo de Resta: ¡Cuidado con el signo!</h2>
+                    <p>La resta funciona igual (posición por posición), pero ten mucho cuidado cuando el elemento de la segunda matriz ya tiene signo negativo.</p>
+                    
+                    <div class="flex-container">
+                        <div class="math-block" style="border-color: var(--primary-gold);">
+                            \( \begin{bmatrix} 8 & 1 \\ \color{var(--accent-red)}{5} & -2 \end{bmatrix} \)
+                        </div>
+                        <div style="font-size: 2rem; font-weight: bold;">-</div>
+                        <div class="math-block" style="border-color: var(--primary-gold);">
+                            \( \begin{bmatrix} 3 & 4 \\ \color{var(--accent-red)}{-2} & 1 \end{bmatrix} \)
+                        </div>
+                        <div style="font-size: 2rem; font-weight: bold;">=</div>
+                        <div class="math-block" style="border-color: var(--accent-red); background: #fff1f2;">
+                            \( \begin{bmatrix} 8-3 & 1-4 \\ \color{var(--accent-red)}{5-(-2)} & -2-1 \end{bmatrix} \)
+                        </div>
+                    </div>
+                    
+                    <div class="info-card" style="margin-top: 20px; text-align: center;">
+                        <p style="margin: 0; font-weight: bold;">Resultado: \( \begin{bmatrix} 5 & -3 \\ \mathbf{7} & -3 \end{bmatrix} \)</p>
+                        <p style="font-size: 0.95rem; color: #64748b; margin-top: 10px;">(Observa que \( 5 - (-2) \) se convirtió en \( 5 + 2 = 7 \)).</p>
+                    </div>
+                </div>
+
+                <!-- 5. El Caso Incompatible -->
+                <div class="slide">
+                    <h2>Incompatibilidad de Dimensiones</h2>
+                    <p>¿Qué pasa si intentamos sumar dos matrices que no tienen la misma forma?</p>
+                    
+                    <div class="flex-container">
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <div class="math-block" style="border-color: var(--primary-slate);">
+                                \( A = \begin{bmatrix} 1 & 4 \\ 2 & 5 \end{bmatrix} \)
+                            </div>
+                            <span style="font-weight: bold;">2 &times; 2</span>
+                        </div>
+                        <div style="font-size: 2rem; font-weight: bold;">+</div>
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <div class="math-block" style="border-color: var(--primary-slate);">
+                                \( B = \begin{bmatrix} 7 & 3 & 0 \\ 9 & -1 & 6 \end{bmatrix} \)
+                            </div>
+                            <span style="font-weight: bold;">2 &times; 3</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-card" style="border-color: var(--accent-red); background: #fff1f2; margin-top: 20px;">
+                        <p style="font-weight: bold; color: var(--accent-red); margin-bottom: 10px;">¡Error Matemático!</p>
+                        <p>No se puede realizar esta suma. La Matriz A no tiene una "columna 3" para que pueda sumarse con el "0" y el "6" de la Matriz B. A esta operación se le llama <strong>"No Definida"</strong>.</p>
+                    </div>
+                </div>
+
+                <!-- 6. QUIZ 1 -->
+                <div class="slide">
+                    <h2>Quiz 1: Reglas de Dimensión</h2>
+                    <p>¿Cuál de las siguientes operaciones SÍ se puede realizar?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'Son dimensiones diferentes. La primera tiene 3 filas, la segunda tiene solo 2.')">A) Sumar una matriz \( 3 \times 2 \) con una \( 2 \times 3 \).</button>
+                        <button class="option-btn" onclick="checkQuiz(1, true, this, '¡Correcto! Como ambas tienen exactamente las mismas dimensiones, se puede restar posición por posición.', '')">B) Restar una matriz \( 1 \times 4 \) con otra \( 1 \times 4 \).</button>
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'Una es cuadrada y la otra no, por lo tanto sobrarán datos que no tienen pareja para sumarse.')">C) Sumar una matriz cuadrada \( 2 \times 2 \) con una matriz fila \( 1 \times 2 \).</button>
+                    </div>
+                    <div id="feedback-1" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 7. QUIZ 2 -->
+                <div class="slide">
+                    <h2>Quiz 2: Cálculo Mental</h2>
+                    <p>Tenemos dos matrices de la misma dimensión: \( A = \begin{bmatrix} 1 & -5 \\ 3 & 4 \end{bmatrix} \) y \( B = \begin{bmatrix} 2 & 9 \\ -3 & 6 \end{bmatrix} \).<br>Si hacemos \( A + B \), ¿cuál será el número en la posición superior derecha (\( a_{12} \))?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'Ese sería el resultado de a_11 (1 + 2 = 3).')">A) \( 3 \)</button>
+                        <button class="option-btn" onclick="checkQuiz(2, true, this, '¡Excelente! Sumaste -5 con 9, lo que da como resultado 4.', '')">B) \( 4 \)</button>
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'Esa sería la posición inferior derecha (4 + 6 = 10).')">C) \( 10 \)</button>
+                    </div>
+                    <div id="feedback-2" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 8. QUIZ 3 -->
+                <div class="slide">
+                    <h2>Quiz 3: Matrices Nulas</h2>
+                    <p>Si sumas cualquier Matriz A con una Matriz Nula de las mismas dimensiones, ¿qué obtienes?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'Al sumar cero, el número no desaparece, simplemente se mantiene igual.')">A) Una Matriz Nula.</button>
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'Eso sería si la multiplicas por una identidad, pero al sumar ceros no cambia la dimensión.')">B) Una Matriz Identidad.</button>
+                        <button class="option-btn" onclick="checkQuiz(3, true, this, '¡Exacto! Es como sumar un cero gigante. La Matriz A no sufre ningún cambio.', '')">C) La misma Matriz A sin ningún cambio.</button>
+                    </div>
+                    <div id="feedback-3" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+            </div> <!-- slide-container -->
+        </div> <!-- viewport -->
+
+        <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled aria-label="Anterior">&#8592;</button>
+        <button class="nav-btn" id="next-btn" onclick="nextSlide()" aria-label="Siguiente">&#8594;</button>
+
+        <div class="slide-indicators">
+            <span id="slide-num">1 / 8</span>
+        </div>
+        <div class="progress-bar" id="progress-bar"></div>
+    </div> <!-- app-container -->
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const container = document.getElementById('slide-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const slideNum = document.getElementById('slide-num');
+        const progressBar = document.getElementById('progress-bar');
+
+        function updateGallery() {
+            container.style.transform = `translateX(-${currentSlide * 100}%)`;
+            slides.forEach((slide, index) => slide.classList.toggle('active', index === currentSlide));
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+            slideNum.innerText = `${currentSlide + 1} / ${slides.length}`;
+            progressBar.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+            
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        function nextSlide() { if (currentSlide < slides.length - 1) { currentSlide++; updateGallery(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateGallery(); } }
+
+        document.addEventListener('keydown', e => { if (e.key === 'ArrowRight' || e.key === ' ') nextSlide(); if (e.key === 'ArrowLeft') prevSlide(); });
+
+        let touchStartX = 0;
+        document.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX, false);
+        document.addEventListener('touchend', e => {
+            let touchEndX = e.changedTouches[0].screenX;
+            if (touchEndX < touchStartX - 40) nextSlide();
+            if (touchEndX > touchStartX + 40) prevSlide();
+        }, false);
+
+        function checkQuiz(qId, isCorrect, btn, correctMsg, incorrectMsg) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const container = btn.parentElement;
+
+            if (isCorrect) {
+                container.querySelectorAll('.option-btn').forEach(b => {
+                    b.disabled = true;
+                    b.style.opacity = "0.5";
+                });
+                btn.disabled = false;
+                btn.style.opacity = "1";
+                btn.style.background = "#dcfce7";
+                btn.style.borderColor = "#059669";
+                btn.style.color = "#065f46";
+                feedback.innerHTML = `✅ &iexcl;Correcto! ${correctMsg}`;
+                feedback.style.color = "#059669";
+            } else {
+                btn.style.background = "#fee2e2";
+                btn.style.borderColor = "#e11d48";
+                btn.style.color = "#9f1239";
+                btn.disabled = true;
+                feedback.innerHTML = `❌ <span>${incorrectMsg}</span> <button onclick="resetQuiz(${qId})" style="margin-left:10px; background:var(--primary-slate); color:white; border:none; padding:5px 12px; border-radius:6px; cursor:pointer; font-size:0.85rem;">Reintentar</button>`;
+                feedback.style.color = "#e11d48";
+            }
+        }
+
+        function resetQuiz(qId) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const container = feedback.parentElement.querySelector('.quiz-container');
+            container.querySelectorAll('.option-btn').forEach(b => {
+                b.disabled = false;
+                b.style.opacity = "1";
+                b.style.background = "white";
+                b.style.borderColor = "#cbd5e1";
+                b.style.color = "var(--primary-slate)";
+            });
+            feedback.innerHTML = "";
+        }
+
+        updateGallery();
+    </script>
+</body>
+
+</html>
