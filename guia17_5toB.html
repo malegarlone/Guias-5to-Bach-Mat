@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía 17: Modelado de Matrices - 5to Bachillerato</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-blue: #1e3a8a;
+            --primary-gold: #b45309;
+            --primary-teal: #0f766e;
+            --primary-slate: #334155;
+            --accent-red: #be123c;
+            --bg-light: #f8fafc;
+            --transition-speed: 0.5s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #cbd5e1;
+            color: #0f172a;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 1024px;
+            height: 600px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: auto;
+        }
+
+        header {
+            background-color: var(--primary-slate);
+            color: white;
+            padding: 0 1.5rem;
+            height: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+            font-weight: 500;
+            z-index: 200;
+            letter-spacing: 0.5px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        #viewport {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        @media (max-height: 650px) or (max-width: 1024px) {
+            #app-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+
+        .slide-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            padding: 20px 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8rem;
+            color: var(--primary-teal);
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 1.05rem;
+            color: #334155;
+            max-width: 800px;
+            line-height: 1.5;
+            margin-bottom: 0.75rem;
+        }
+
+        .info-card {
+            padding: 1rem 1.2rem;
+            border-radius: 8px;
+            background: #f1f5f9;
+            margin: 0.5rem 0;
+            width: 100%;
+            max-width: 780px;
+            text-align: left;
+            border-left: 5px solid var(--primary-blue);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+        }
+
+        .math-matrix {
+            display: inline-flex;
+            align-items: center;
+            font-family: 'Outfit', sans-serif;
+            font-weight: bold;
+            color: var(--primary-blue);
+            margin: 0 10px;
+            font-size: 1.2rem;
+            vertical-align: middle;
+        }
+
+        .matrix-bracket {
+            width: 8px;
+            border: 2.5px solid var(--primary-blue);
+            align-self: stretch;
+            border-radius: 4px;
+        }
+
+        .bracket-left {
+            border-right: none;
+            margin-right: 6px;
+        }
+
+        .bracket-right {
+            border-left: none;
+            margin-left: 6px;
+        }
+
+        .matrix-grid {
+            display: grid;
+            gap: 6px 12px;
+            text-align: center;
+            align-items: center;
+        }
+
+        .matrix-input {
+            width: 48px;
+            padding: 4px 6px;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1rem;
+            outline: none;
+            color: var(--primary-slate);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .matrix-input:focus {
+            border-color: var(--primary-blue);
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease;
+            z-index: 250;
+            border: 1px solid #e2e8f0;
+            color: var(--primary-slate);
+            font-size: 1.5rem;
+            user-select: none;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-50%) scale(1.1);
+            background-color: #f8fafc;
+            color: var(--primary-blue);
+            border-color: var(--primary-blue);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #prev-btn {
+            left: 20px;
+        }
+
+        #next-btn {
+            right: 20px;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            padding: 0;
+            bottom: 1.5rem;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: #64748b;
+            z-index: 100;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 6px;
+            background: var(--primary-gold);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            width: 100%;
+            max-width: 650px;
+            margin: 0.5rem auto 0;
+        }
+
+        .option-btn {
+            padding: 0.8rem 1.2rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1rem;
+            transition: all 0.3s;
+            color: var(--primary-slate);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-blue);
+            background: #f0f9ff;
+        }
+
+        .flex-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .row-highlight {
+            background-color: rgba(30, 58, 138, 0.1);
+            border-radius: 4px;
+            padding: 2px;
+        }
+
+        .col-highlight {
+            background-color: rgba(15, 118, 110, 0.15);
+            border-radius: 4px;
+            padding: 2px;
+        }
+
+        .step-card {
+            background: #fffbeb;
+            border: 1px dashed var(--primary-gold);
+            border-radius: 10px;
+            padding: 10px 20px;
+            width: 100%;
+            max-width: 780px;
+            margin-top: 15px;
+            min-height: 80px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app-container">
+        <header id="global-header">
+            <span>Colegio Escolaris - Matemática 5to Bachillerato</span>
+            <span>Guía 17: Modelado de Matrices</span>
+        </header>
+
+        <div id="viewport">
+            <div class="slide-container" id="slide-container">
+
+                <!-- 1. Portada -->
+                <div class="slide active">
+                    <div style="font-size: 4rem; margin-bottom: 15px;">📊🧮</div>
+                    <h1>Modelado de Matrices</h1>
+                    <h2>Organización y Operación de Datos Reales</h2>
+                    <p style="color: #64748b; font-style: italic; margin-top: 0.5rem;">Aprende cómo las matrices representan sistemas del mundo real y cómo resolverlos mediante operaciones estructuradas.</p>
+                </div>
+
+                <!-- 2. Objetivos -->
+                <div class="slide">
+                    <h2>¿Qué aprenderemos hoy?</h2>
+                    <div class="info-card" style="border-left-color: var(--primary-blue); background: #f8fafc; max-width: 600px;">
+                        <ul style="list-style-type: none; font-size: 1.1rem; line-height: 1.8; color: var(--primary-slate);">
+                            <li>🏢 <strong>Organizar</strong> información comercial compleja utilizando filas y columnas.</li>
+                            <li>✖️ <strong>Aplicar</strong> la multiplicación de matrices para resolver problemas de inventario y costos.</li>
+                            <li>🔢 <strong>Interpretar</strong> el significado práctico de cada posición en la matriz resultante.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 3. Diapositiva Teórica 1: ¿Qué es el Modelado? -->
+                <div class="slide">
+                    <h2>1. El Concepto de Modelado Matricial</h2>
+                    <p>Modelar con matrices significa transcribir una situación de la vida real a un arreglo rectangular de números. Esto simplifica el procesamiento de datos masivos.</p>
+                    <div class="info-card" style="border-left-color: var(--primary-teal); background: #f0fdfa;">
+                        <p style="font-size: 1rem; color: var(--primary-slate);">
+                            Las <strong>filas</strong> suelen agrupar diferentes entidades o ubicaciones (ejemplo: Tiendas, Regiones, Personas).<br>
+                            Las <strong>columnas</strong> suelen representar variables o atributos (ejemplo: Productos, Días de la semana, Características).
+                        </p>
+                    </div>
+                    <p style="font-size: 0.95rem; color: #64748b; margin-top: 5px;">Cada dato individual ocupa una posición única denoted por su fila y columna: <em>a<sub>fila, columna</sub></em>.</p>
+                </div>
+
+                <!-- 4. Diapositiva Teórica 2: Planteamiento del Problema -->
+                <div class="slide">
+                    <h2>2. Planteamiento del Problema Visual</h2>
+                    <p>Imagina que eres dueño de dos tiendas de ropa: <strong>Tienda A</strong> y <strong>Tienda B</strong>. Vendes tres productos principales: <strong>Camisas</strong>, <strong>Pantalones</strong> y <strong>Chaquetas</strong>.</p>
+                    <div class="info-card" style="border-left-color: var(--primary-gold); background: #fffbeb;">
+                        <h3 style="color: var(--primary-gold); margin-bottom: 5px; font-size: 1.05rem;">Inventario actual en almacén:</h3>
+                        <ul style="margin-left: 20px; font-size: 0.95rem; line-height: 1.5; color: var(--primary-slate);">
+                            <li><strong>Tienda A:</strong> tiene 50 Camisas, 30 Pantalones y 20 Chaquetas.</li>
+                            <li><strong>Tienda B:</strong> tiene 40 Camisas, 25 Pantalones y 35 Chaquetas.</li>
+                        </ul>
+                        <h3 style="color: var(--primary-gold); margin-top: 10px; margin-bottom: 5px; font-size: 1.05rem;">Precio unitario de venta de cada producto:</h3>
+                        <p style="margin: 0; font-size: 0.95rem; color: var(--primary-slate);">Cada Camisa cuesta Q100, cada Pantalón Q150 y cada Chaqueta Q300.</p>
+                    </div>
+                    <p style="font-size: 0.95rem; color: #64748b;">¿Cómo organizamos esto matricialmente para calcular el valor total del almacén por tienda?</p>
+                </div>
+
+                <!-- 5. Diapositiva Teórica 3: Matriz de Inventario -->
+                <div class="slide">
+                    <h2>3. La Matriz de Inventario (I)</h2>
+                    <p>Agrupamos las existencias en una matriz de orden <strong>2 &times; 3</strong> (2 filas correspondientes a las tiendas, 3 columnas correspondientes a los productos).</p>
+                    
+                    <div class="flex-container">
+                        <div style="text-align: right; font-family: 'Outfit'; font-weight: bold; color: var(--primary-slate); font-size: 1.1rem; line-height: 1.8;">
+                            Tienda A &rarr;<br>
+                            Tienda B &rarr;
+                        </div>
+                        <div class="math-matrix">
+                            <div class="matrix-bracket bracket-left" style="border-color: var(--primary-blue);"></div>
+                            <div class="matrix-grid" style="grid-template-columns: repeat(3, 50px);">
+                                <span style="color: var(--primary-blue);">50</span><span style="color: var(--primary-teal);">30</span><span style="color: var(--primary-gold);">20</span>
+                                <span style="color: var(--primary-blue);">40</span><span style="color: var(--primary-teal);">25</span><span style="color: var(--primary-gold);">35</span>
+                            </div>
+                            <div class="matrix-bracket bracket-right" style="border-color: var(--primary-blue);"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-container" style="justify-content: center; font-size: 0.9rem; font-weight: bold; margin-top: 10px;">
+                        <span style="color: var(--primary-blue); margin: 0 15px;">Columnas: Camisas</span>
+                        <span style="color: var(--primary-teal); margin: 0 15px;">Pantalones</span>
+                        <span style="color: var(--primary-gold); margin: 0 15px;">Chaquetas</span>
+                    </div>
+                </div>
+
+                <!-- 6. Diapositiva Teórica 4: Matriz de Precios -->
+                <div class="slide">
+                    <h2>4. La Matriz de Precios (P)</h2>
+                    <p>Para poder multiplicar el inventario por los precios, los precios deben organizarse en una matriz columna de orden <strong>3 &times; 1</strong> (3 filas representando los productos y 1 columna).</p>
+                    
+                    <div class="flex-container">
+                        <div style="text-align: right; font-family: 'Outfit'; font-weight: bold; color: var(--primary-slate); font-size: 1rem; line-height: 2.2; margin-right: 10px;">
+                            Precio Camisa &rarr;<br>
+                            Precio Pantalón &rarr;<br>
+                            Precio Chaqueta &rarr;
+                        </div>
+                        <div class="math-matrix" style="font-size: 1.3rem;">
+                            <div class="matrix-bracket bracket-left" style="height: 100px; border-color: var(--primary-teal);"></div>
+                            <div class="matrix-grid" style="grid-template-columns: 60px; grid-template-rows: repeat(3, 28px);">
+                                <span style="color: var(--primary-blue);">100</span>
+                                <span style="color: var(--primary-teal);">150</span>
+                                <span style="color: var(--primary-gold);">300</span>
+                            </div>
+                            <div class="matrix-bracket bracket-right" style="height: 100px; border-color: var(--primary-teal);"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. Diapositiva Teórica 5: El Producto I x P -->
+                <div class="slide">
+                    <h2>5. El Producto de Modelado (I &times; P)</h2>
+                    <p>Multiplicamos la matriz de inventario <strong>I (2 &times; 3)</strong> por la matriz de precios <strong>P (3 &times; 1)</strong>. Como los números internos chocan (3 columnas de I = 3 filas de P), el resultado será de dimensión <strong>2 &times; 1</strong>.</p>
+                    
+                    <div class="info-card" style="border-left-color: var(--accent-red); background: #fff1f2; font-size: 0.95rem; line-height: 1.6;">
+                        <strong>Operación por Tienda:</strong><br>
+                        * <strong>Valor Tienda A:</strong> (50 &times; 100) + (30 &times; 150) + (20 &times; 300) = 5000 + 4500 + 6000 = <strong>Q15,500</strong><br>
+                        * <strong>Valor Tienda B:</strong> (40 &times; 100) + (25 &times; 150) + (35 &times; 300) = 4000 + 3750 + 10500 = <strong>Q18,250</strong>
+                    </div>
+                    
+                    <div class="flex-container" style="margin-top: 10px;">
+                        <span style="font-family: 'Outfit'; font-weight: bold; font-size: 1.1rem; color: var(--primary-slate);">Matriz de Resultados:</span>
+                        <div class="math-matrix" style="color: var(--primary-teal); font-size: 1.3rem;">
+                            <div class="matrix-bracket bracket-left" style="height: 60px;"></div>
+                            <div class="matrix-grid" style="grid-template-columns: 80px;">
+                                <span>15500</span>
+                                <span>18250</span>
+                            </div>
+                            <div class="matrix-bracket bracket-right" style="height: 60px;"></div>
+                        </div>
+                        <div style="font-size: 0.9rem; font-family: 'Outfit'; font-weight: bold; color: var(--primary-slate); text-align: left; line-height: 1.8;">
+                            &larr; Valor total en Tienda A (Q)<br>
+                            &larr; Valor total en Tienda B (Q)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 8. Calculador de Modelado -->
+                <div class="slide">
+                    <h2 style="margin-bottom: 2px;">Simulador de Inventario y Precios</h2>
+                    <p style="font-size: 0.9rem; margin-bottom: 5px;">Modifica las existencias de ropa de tus tiendas y observa cómo se modela el costo total en tiempo real.</p>
+                    
+                    <div class="flex-container" style="margin-top: 5px;">
+                        <!-- Matriz I -->
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <span style="font-weight: bold; font-size: 0.9rem; color: var(--primary-blue); font-family: 'Outfit'; margin-bottom: 2px;">Existencias (I)</span>
+                            <div class="math-matrix">
+                                <div class="matrix-bracket bracket-left" style="height: 80px;"></div>
+                                <div class="matrix-grid" style="grid-template-columns: repeat(3, auto); grid-template-rows: repeat(2, 35px);">
+                                    <input type="number" id="i11" class="matrix-input" value="50" oninput="calcValue()">
+                                    <input type="number" id="i12" class="matrix-input" value="30" oninput="calcValue()">
+                                    <input type="number" id="i13" class="matrix-input" value="20" oninput="calcValue()">
+                                    <input type="number" id="i21" class="matrix-input" value="40" oninput="calcValue()">
+                                    <input type="number" id="i22" class="matrix-input" value="25" oninput="calcValue()">
+                                    <input type="number" id="i23" class="matrix-input" value="35" oninput="calcValue()">
+                                </div>
+                                <div class="matrix-bracket bracket-right" style="height: 80px;"></div>
+                            </div>
+                        </div>
+
+                        <div style="font-size: 1.5rem; font-weight: bold; align-self: center; margin-top: 15px;">&times;</div>
+
+                        <!-- Matriz P -->
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <span style="font-weight: bold; font-size: 0.9rem; color: var(--primary-teal); font-family: 'Outfit'; margin-bottom: 2px;">Precios (P)</span>
+                            <div class="math-matrix">
+                                <div class="matrix-bracket bracket-left" style="height: 110px; border-color: var(--primary-teal);"></div>
+                                <div class="matrix-grid" style="grid-template-columns: auto; grid-template-rows: repeat(3, 35px);">
+                                    <input type="number" id="p11" class="matrix-input" value="100" style="border-color: var(--primary-teal);" oninput="calcValue()">
+                                    <input type="number" id="p21" class="matrix-input" value="150" style="border-color: var(--primary-teal);" oninput="calcValue()">
+                                    <input type="number" id="p31" class="matrix-input" value="300" style="border-color: var(--primary-teal);" oninput="calcValue()">
+                                </div>
+                                <div class="matrix-bracket bracket-right" style="height: 110px; border-color: var(--primary-teal);"></div>
+                            </div>
+                        </div>
+
+                        <div style="font-size: 1.5rem; font-weight: bold; align-self: center; margin-top: 15px;">=</div>
+
+                        <!-- Matriz de Resultado -->
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <span style="font-weight: bold; font-size: 0.9rem; color: var(--primary-gold); font-family: 'Outfit'; margin-bottom: 2px;">Costo (I&times;P)</span>
+                            <div class="math-matrix" style="color: var(--primary-gold);">
+                                <div class="matrix-bracket bracket-left" style="height: 80px; border-color: var(--primary-gold);"></div>
+                                <div class="matrix-grid" style="grid-template-columns: 80px; grid-template-rows: repeat(2, 35px);">
+                                    <span id="r1" style="font-size: 1.1rem;">15500</span>
+                                    <span id="r2" style="font-size: 1.1rem;">18250</span>
+                                </div>
+                                <div class="matrix-bracket bracket-right" style="height: 80px; border-color: var(--primary-gold);"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paso a Paso -->
+                    <div class="step-card" id="step-output">
+                        Cargando pasos...
+                    </div>
+                </div>
+
+                <!-- 9. Quiz 1 -->
+                <div class="slide">
+                    <h2>Evaluación Teórica 1</h2>
+                    <p style="margin-bottom: 10px;">Si una matriz de inventario tiene dimensiones <strong>3 &times; 4</strong> (3 tiendas y 4 tipos de productos) y queremos calcular el valor de las existencias, ¿cuál debe ser la dimensión de la matriz de precios unitarios?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'Incorrecto. Para que las matrices se puedan multiplicar, las filas de la matriz de precios deben coincidir con las columnas de la de inventario (que son 4).')">A) Debe ser de orden 3 &times; 1</button>
+                        <button class="option-btn" onclick="checkQuiz(1, true, this, '¡Correcto! El número de filas de la matriz de precios debe ser igual al número de columnas de la de inventarios (4 columnas de artículos = 4 filas de precios unitarios). Dimensión: 4x1.', '')">B) Debe ser de orden 4 &times; 1</button>
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'Incorrecto. Una matriz de 3x4 no se puede multiplicar por una de 1x4 (los números internos 4 y 1 no coinciden).')">C) Debe ser de orden 1 &times; 4</button>
+                    </div>
+                    <div id="feedback-1" style="margin-top: 0.8rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 10. Quiz 2 -->
+                <div class="slide">
+                    <h2>Evaluación Teórica 2</h2>
+                    <p style="margin-bottom: 10px;">Al realizar el producto de inventario por precios <em>I</em> &times; <em>P</em> = <em>C</em>, ¿qué representa físicamente el elemento que se encuentra en la posición <strong>c<sub>21</sub></strong> de la matriz resultante?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'Incorrecto. La primera fila de la matriz corresponde a la Tienda A, la segunda fila corresponde a la Tienda B.')">A) El valor total de los productos de la Tienda A.</button>
+                        <button class="option-btn" onclick="checkQuiz(2, true, this, '¡Excelente! Dado que la fila 2 corresponde a la Tienda B y la columna 1 es la columna de costos acumulados, c₂₁ representa el costo total de existencias en la Tienda B.', '')">B) El valor total de los productos de la Tienda B.</button>
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'Incorrecto. El costo individual de las chaquetas se encuentra en la matriz P original de precios unitarios, no en la matriz de salida.')">C) El costo de las chaquetas vendidas en ambas tiendas.</button>
+                    </div>
+                    <div id="feedback-2" style="margin-top: 0.8rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 11. Quiz 3 -->
+                <div class="slide">
+                    <h2>Evaluación Teórica 3</h2>
+                    <p style="margin-bottom: 10px;">¿Por qué no es posible modelar el costo total de los productos multiplicando una matriz de inventario de <strong>2 &times; 3</strong> por una matriz de precios de <strong>2 &times; 1</strong>?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(3, true, this, '¡Correcto! En la multiplicación A x B, el número de columnas de A (3) debe coincidir con las filas de B (2). Al no ser iguales, la operación no está definida algebraicamente.', '')">A) Porque el número de columnas del inventario (3) no coincide con el número de filas de los precios (2).</button>
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'Incorrecto. Aunque es cierto que no son del mismo orden, eso impide sumarlas, pero no multiplicarlas. Para multiplicación la regla es diferente.')">B) Porque para multiplicar matrices es obligatorio que ambas tengan exactamente el mismo orden.</button>
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'Incorrecto. El número resultante de tiendas no condiciona la multiplicación, son los parámetros de columnas y filas internas.')">C) Porque el número resultante de tiendas sería incorrecto.</button>
+                    </div>
+                    <div id="feedback-3" style="margin-top: 0.8rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 12. Final -->
+                <div class="slide">
+                    <div style="font-size: 4.5rem;">🎯</div>
+                    <h2>¡Misión Cumplida!</h2>
+                    <p>¡Has dominado el modelado de matrices para resolver problemas de inventarios y sistemas de datos reales!</p>
+                    <button onclick="goToSlide(0)"
+                        style="background: var(--primary-gold); color: white; border: none; padding: 0.8rem 1.8rem; border-radius: 30px; font-weight: 700; cursor: pointer; margin-top: 1rem; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Volver al inicio</button>
+                </div>
+
+            </div>
+        </div>
+
+        <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled aria-label="Anterior">&#8592;</button>
+        <button class="nav-btn" id="next-btn" onclick="nextSlide()" aria-label="Siguiente">&#8594;</button>
+
+        <div class="slide-indicators">
+            <span id="slide-num">1 / 12</span>
+        </div>
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const container = document.getElementById('slide-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const slideNum = document.getElementById('slide-num');
+        const progressBar = document.getElementById('progress-bar');
+
+        function updateGallery() {
+            container.style.transform = `translateX(-${currentSlide * 100}%)`;
+            slides.forEach((slide, index) => slide.classList.toggle('active', index === currentSlide));
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+            slideNum.innerText = `${currentSlide + 1} / ${slides.length}`;
+            progressBar.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+        }
+
+        function nextSlide() { if (currentSlide < slides.length - 1) { currentSlide++; updateGallery(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateGallery(); } }
+        function goToSlide(n) { currentSlide = n; updateGallery(); }
+
+        document.addEventListener('keydown', e => { 
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide(); 
+            if (e.key === 'ArrowLeft') prevSlide(); 
+        });
+
+        // Widget code
+        function calcValue() {
+            const i11 = parseFloat(document.getElementById('i11').value) || 0;
+            const i12 = parseFloat(document.getElementById('i12').value) || 0;
+            const i13 = parseFloat(document.getElementById('i13').value) || 0;
+            const i21 = parseFloat(document.getElementById('i21').value) || 0;
+            const i22 = parseFloat(document.getElementById('i22').value) || 0;
+            const i23 = parseFloat(document.getElementById('i23').value) || 0;
+
+            const p11 = parseFloat(document.getElementById('p11').value) || 0;
+            const p21 = parseFloat(document.getElementById('p21').value) || 0;
+            const p31 = parseFloat(document.getElementById('p31').value) || 0;
+
+            const val1 = i11 * p11 + i12 * p21 + i13 * p31;
+            const val2 = i21 * p11 + i22 * p21 + i23 * p31;
+
+            document.getElementById('r1').innerText = val1;
+            document.getElementById('r2').innerText = val2;
+
+            document.getElementById('step-output').innerHTML = `
+                <div style="font-weight: 700; color: var(--primary-gold); margin-bottom: 6px; font-size: 1rem; text-align: center;">Operación de Producto de Matrices:</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px 30px; text-align: left; font-size: 0.9rem; font-family: 'Outfit'; color: var(--primary-slate);">
+                    <div><span class="row-highlight">Tienda A (Fila 1)</span> &times; <span class="col-highlight">Precios (Col 1)</span>:<br>
+                    (${i11} &times; ${p11}) + (${i12} &times; ${p21}) + (${i13} &times; ${p31}) = <strong>Q${val1}</strong></div>
+                    <div><span class="row-highlight">Tienda B (Fila 2)</span> &times; <span class="col-highlight">Precios (Col 1)</span>:<br>
+                    (${i21} &times; ${p11}) + (${i22} &times; ${p21}) + (${i23} &times; ${p31}) = <strong>Q${val2}</strong></div>
+                </div>
+            `;
+        }
+
+        // Quiz Logic
+        function checkQuiz(qId, isCorrect, btn, correctMsg, incorrectMsg) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const containerOpts = btn.parentElement;
+
+            if (isCorrect) {
+                containerOpts.querySelectorAll('.option-btn').forEach(b => {
+                    b.disabled = true;
+                    b.style.opacity = "0.5";
+                });
+                btn.disabled = false;
+                btn.style.opacity = "1";
+                btn.style.background = "#dcfce7";
+                btn.style.borderColor = "#10b981";
+                btn.style.color = "#065f46";
+                feedback.innerHTML = `✅ ¡Correcto! ${correctMsg}`;
+                feedback.style.color = "#10b981";
+            } else {
+                btn.style.background = "#fee2e2";
+                btn.style.borderColor = "#dc2626";
+                btn.style.color = "#9f1239";
+                btn.disabled = true;
+                feedback.innerHTML = `❌ <span>${incorrectMsg}</span> <button onclick="resetQuiz(${qId})" style="margin-left:10px; background:var(--primary-slate); color:white; border:none; padding:4px 10px; border-radius:6px; cursor:pointer; font-size:0.8rem;">Reintentar</button>`;
+                feedback.style.color = "#dc2626";
+            }
+        }
+
+        function resetQuiz(qId) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const containerOpts = feedback.parentElement.querySelector('.quiz-container');
+            containerOpts.querySelectorAll('.option-btn').forEach(b => {
+                b.disabled = false;
+                b.style.opacity = "1";
+                b.style.background = "white";
+                b.style.borderColor = "#cbd5e1";
+                b.style.color = "var(--primary-slate)";
+            });
+            feedback.innerHTML = "";
+        }
+
+        calcValue();
+        updateGallery();
+    </script>
+</body>
+
+</html>

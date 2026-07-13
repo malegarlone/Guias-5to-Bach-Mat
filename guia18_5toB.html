@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía 18: Límites de Funciones - 5to Bachillerato</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-blue: #1e3a8a;
+            --primary-gold: #b45309;
+            --primary-teal: #0f766e;
+            --primary-slate: #334155;
+            --accent-red: #be123c;
+            --bg-light: #f8fafc;
+            --transition-speed: 0.5s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #cbd5e1;
+            color: #0f172a;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 1024px;
+            height: 600px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: auto;
+        }
+
+        header {
+            background-color: var(--primary-slate);
+            color: white;
+            padding: 0 1.5rem;
+            height: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+            font-weight: 500;
+            z-index: 200;
+            letter-spacing: 0.5px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        #viewport {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        @media (max-height: 650px) or (max-width: 1024px) {
+            #app-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+
+        .slide-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            padding: 20px 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.7rem;
+            color: var(--primary-teal);
+            margin-bottom: 0.8rem;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 1.05rem;
+            color: #334155;
+            max-width: 820px;
+            line-height: 1.5;
+            margin-bottom: 0.6rem;
+        }
+
+        .info-card {
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            background: #f1f5f9;
+            margin: 0.4rem 0;
+            width: 100%;
+            max-width: 780px;
+            text-align: left;
+            border-left: 5px solid var(--primary-blue);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease;
+            z-index: 250;
+            border: 1px solid #e2e8f0;
+            color: var(--primary-slate);
+            font-size: 1.5rem;
+            user-select: none;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-50%) scale(1.1);
+            background-color: #f8fafc;
+            color: var(--primary-blue);
+            border-color: var(--primary-blue);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #prev-btn {
+            left: 20px;
+        }
+
+        #next-btn {
+            right: 20px;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            padding: 0;
+            bottom: 1.5rem;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: #64748b;
+            z-index: 100;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 6px;
+            background: var(--primary-gold);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 100%;
+            max-width: 650px;
+            margin: 0.5rem auto 0;
+        }
+
+        .option-btn {
+            padding: 0.7rem 1.1rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            color: var(--primary-slate);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-blue);
+            background: #f0f9ff;
+        }
+
+        .flex-container {
+            display: flex;
+            gap: 25px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 5px;
+            width: 100%;
+            max-width: 840px;
+        }
+
+        .expl-layout {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 820px;
+            margin-top: 5px;
+            height: 310px;
+        }
+
+        .expl-control {
+            flex: 1;
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 12px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            text-align: left;
+            justify-content: center;
+        }
+
+        .expl-visual {
+            flex: 1.2;
+            background: white;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .limit-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        .limit-table th, .limit-table td {
+            border: 1px solid #cbd5e1;
+            padding: 4px;
+        }
+
+        .limit-table th {
+            background-color: var(--primary-blue);
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app-container">
+        <header id="global-header">
+            <span>Colegio Escolaris - Matemática 5to Bachillerato</span>
+            <span>Guía 18: Límites de Funciones</span>
+        </header>
+
+        <div id="viewport">
+            <div class="slide-container" id="slide-container">
+
+                <!-- 1. Portada -->
+                <div class="slide active">
+                    <div style="font-size: 4rem; margin-bottom: 15px;">🎯📈</div>
+                    <h1>Límites de Funciones</h1>
+                    <h2>El Concepto del Infinitésimo y la Aproximación</h2>
+                    <p style="color: #64748b; font-style: italic; margin-top: 0.5rem;">Explora cómo analizar el comportamiento de las funciones cuando nos acercamos infinitamente a un punto.</p>
+                </div>
+
+                <!-- 2. Objetivos -->
+                <div class="slide">
+                    <h2>¿Qué aprenderemos hoy?</h2>
+                    <div class="info-card" style="border-left-color: var(--primary-blue); background: #f8fafc; max-width: 600px;">
+                        <ul style="list-style-type: none; font-size: 1.1rem; line-height: 1.8; color: var(--primary-slate);">
+                            <li>🔍 <strong>Comprender</strong> la definición intuitiva del límite de una función.</li>
+                            <li>📊 <strong>Analizar e interpretar</strong> los límites de manera visual utilizando gráficas con ejes acotados.</li>
+                            <li>🔄 <strong>Identificar</strong> la diferencia entre límites laterales convergentes y discontinuidades de salto.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 3. Definición de Límite -->
+                <div class="slide">
+                    <h2>¿Qué es un Límite?</h2>
+                    <p>El límite de una función es el valor <em>L</em> al que se aproxima la función <em>f</em>(<em>x</em>) a medida que la variable independiente <em>x</em> se acerca a un valor específico <em>c</em>.</p>
+                    <div class="info-card" style="border-left-color: var(--primary-teal); background: #f0fdf4;">
+                        <p style="font-size: 1rem; color: var(--primary-slate); line-height: 1.6;">
+                            Se escribe: <strong style="font-family: 'Outfit', sans-serif; font-size: 1.25rem; color: var(--primary-blue);">lim<sub>x &rarr; c</sub> f(x) = L</strong><br>
+                            Esto se lee: <em>"El límite de f(x) cuando x tiende a c es igual a L"</em>.
+                        </p>
+                    </div>
+                    <p style="font-size: 0.95rem; color: #64748b; margin-top: 5px;">Para que el límite exista, la función debe aproximarse a ese mismo valor tanto si nos acercamos por la izquierda (<em>x</em> &rarr; <em>c</em><sup>-</sup>) como por la derecha (<em>x</em> &rarr; <em>c</em><sup>+</sup>).</p>
+                </div>
+
+                <!-- 4. Ejemplo 1: Límite Directo -->
+                <div class="slide">
+                    <h2>Ejemplo Gráfico 1: Límite Directo</h2>
+                    <p style="margin-bottom: 5px;">En esta curva continua <em>f</em>(<em>x</em>) = <em>x</em> + 1, calculemos el límite cuando <em>x</em> tiende a 2.</p>
+                    
+                    <div class="flex-container">
+                        <!-- SVG plot -->
+                        <svg width="240" height="200" style="background:#fdfaf6; border-radius:8px; border:1px solid #cbd5e1; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                            <!-- Grid horizontal -->
+                            <line x1="0" y1="20" x2="240" y2="20" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="0" y1="40" x2="240" y2="40" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="0" y1="60" x2="240" y2="60" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="0" y1="80" x2="240" y2="80" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="0" y1="120" x2="240" y2="120" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="0" y1="140" x2="240" y2="140" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="0" y1="160" x2="240" y2="160" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="0" y1="180" x2="240" y2="180" stroke="#cbd5e1" stroke-width="0.5" />
+                            <!-- Grid vertical -->
+                            <line x1="20" y1="0" x2="20" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="40" y1="0" x2="40" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="60" y1="0" x2="60" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="80" y1="0" x2="80" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="100" y1="0" x2="100" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="140" y1="0" x2="140" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="160" y1="0" x2="160" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="180" y1="0" x2="180" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="200" y1="0" x2="200" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="220" y1="0" x2="220" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+
+                            <!-- Axes -->
+                            <line x1="0" y1="100" x2="240" y2="100" stroke="#475569" stroke-width="2" />
+                            <line x1="120" y1="0" x2="120" y2="200" stroke="#475569" stroke-width="2" />
+
+                            <!-- Labels and numbers -->
+                            <text x="230" y="92" font-size="10" font-weight="bold" fill="#1e293b">X</text>
+                            <text x="126" y="15" font-size="10" font-weight="bold" fill="#1e293b">Y</text>
+                            <text x="160" y="112" font-size="9" fill="#64748b" text-anchor="middle">2</text>
+                            <text x="200" y="112" font-size="9" fill="#64748b" text-anchor="middle">4</text>
+                            <text x="80" y="112" font-size="9" fill="#64748b" text-anchor="middle">-2</text>
+                            <text x="110" y="64" font-size="9" fill="#64748b" text-anchor="end">2</text>
+                            <text x="110" y="44" font-size="9" fill="#64748b" text-anchor="end">3</text>
+                            <text x="110" y="24" font-size="9" fill="#64748b" text-anchor="end">4</text>
+
+                            <!-- Line Curve y = x + 1 -->
+                            <line x1="40" y1="180" x2="200" y2="20" stroke="var(--primary-blue)" stroke-width="2.5" />
+
+                            <!-- Point coordinates -->
+                            <line x1="160" y1="40" x2="160" y2="100" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,3" />
+                            <line x1="160" y1="40" x2="120" y2="40" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,3" />
+                            <circle cx="160" cy="40" r="5" fill="var(--accent-red)" />
+                        </svg>
+
+                        <div class="info-card" style="margin:0; flex:1;">
+                            <p style="font-size:0.95rem; line-height:1.6; margin:0;">
+                                Observamos la gráfica en la cuadrícula:<br>
+                                Al acercarnos al valor <em>x</em>=2 desde la izquierda (<em>x</em> &rarr; 2<sup>-</sup>) y desde la derecha (<em>x</em> &rarr; 2<sup>+</sup>), la altura en el eje Y se aproxima al número <strong>3</strong>.<br>
+                                Como la función es continua, el límite coincide con el valor evaluado: <br>
+                                <strong style="color:var(--primary-teal);">lim<sub>x &rarr; 2</sub> (x + 1) = 3</strong>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Ejemplo 2: Límite con Hueco -->
+                <div class="slide">
+                    <h2>Ejemplo Gráfico 2: Límite con Hueco</h2>
+                    <p style="margin-bottom: 5px;">Calculemos el límite cuando <em>x</em> tiende a 2 de la función discontinua: <em>f</em>(<em>x</em>) = <span class="math-fraction"><span class="math-numerator">x&sup2; - 4</span><span class="math-denominator">x - 2</span></span>.</p>
+                    
+                    <div class="flex-container">
+                        <!-- SVG plot -->
+                        <svg width="240" height="200" style="background:#fdfaf6; border-radius:8px; border:1px solid #cbd5e1; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                            <!-- Grid horizontal -->
+                            <line x1="0" y1="20" x2="240" y2="20" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="0" y1="40" x2="240" y2="40" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="0" y1="60" x2="240" y2="60" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="0" y1="80" x2="240" y2="80" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="0" y1="120" x2="240" y2="120" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="0" y1="140" x2="240" y2="140" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="0" y1="160" x2="240" y2="160" stroke="#cbd5e1" stroke-width="0.5" />
+                            <!-- Grid vertical -->
+                            <line x1="20" y1="0" x2="20" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="40" y1="0" x2="40" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="60" y1="0" x2="60" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="80" y1="0" x2="80" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="100" y1="0" x2="100" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="140" y1="0" x2="140" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="160" y1="0" x2="160" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="180" y1="0" x2="180" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="200" y1="0" x2="200" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+
+                            <!-- Axes -->
+                            <line x1="0" y1="100" x2="240" y2="100" stroke="#475569" stroke-width="2" />
+                            <line x1="120" y1="0" x2="120" y2="200" stroke="#475569" stroke-width="2" />
+
+                            <!-- Labels -->
+                            <text x="230" y="92" font-size="10" font-weight="bold" fill="#1e293b">X</text>
+                            <text x="126" y="15" font-size="10" font-weight="bold" fill="#1e293b">Y</text>
+                            <text x="160" y="112" font-size="9" fill="#64748b" text-anchor="middle">2</text>
+                            <text x="110" y="24" font-size="9" fill="#64748b" text-anchor="end">4</text>
+
+                            <!-- Line Curve y = x + 2 (simplified) -->
+                            <line x1="40" y1="160" x2="200" y2="0" stroke="var(--primary-teal)" stroke-width="2.5" />
+
+                            <!-- Point coordinates with hole at (2,4) -->
+                            <line x1="160" y1="20" x2="160" y2="100" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,3" />
+                            <line x1="160" y1="20" x2="120" y2="20" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,3" />
+                            <circle cx="160" cy="20" r="5" fill="white" stroke="var(--accent-red)" stroke-width="2.5" />
+                        </svg>
+
+                        <div class="info-card" style="margin:0; flex:1; border-left-color: var(--primary-teal);">
+                            <p style="font-size:0.95rem; line-height:1.6; margin:0;">
+                                Note que <em>f</em>(2) = <span class="math-fraction"><span class="math-numerator">0</span><span class="math-denominator">0</span></span> no está definida en la gráfica (representada con un hueco blanco).<br>
+                                Sin embargo, al seguir la curva desde la izquierda y la derecha, los valores de <em>Y</em> se acercan infinitamente al valor <strong>4</strong>.<br>
+                                Por lo tanto, aunque la función no existe en el punto exacto, el límite sí existe y es: <br>
+                                <strong style="color:var(--primary-blue);">lim<sub>x &rarr; 2</sub> f(x) = 4</strong>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Ejemplo 3: Discontinuidad de Salto -->
+                <div class="slide">
+                    <h2>Ejemplo Gráfico 3: Discontinuidad de Salto</h2>
+                    <p style="margin-bottom: 5px;">Calculemos el límite cuando <em>x</em> tiende a 2 de esta función por trozos.</p>
+                    
+                    <div class="flex-container">
+                        <!-- SVG plot -->
+                        <svg width="240" height="200" style="background:#fdfaf6; border-radius:8px; border:1px solid #cbd5e1; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                            <!-- Grid horizontal -->
+                            <line x1="0" y1="20" x2="240" y2="20" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="0" y1="40" x2="240" y2="40" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="0" y1="60" x2="240" y2="60" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="0" y1="80" x2="240" y2="80" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="0" y1="120" x2="240" y2="120" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="0" y1="140" x2="240" y2="140" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="0" y1="160" x2="240" y2="160" stroke="#cbd5e1" stroke-width="0.5" />
+                            <!-- Grid vertical -->
+                            <line x1="20" y1="0" x2="20" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="40" y1="0" x2="40" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="60" y1="0" x2="60" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="80" y1="0" x2="80" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="100" y1="0" x2="100" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="140" y1="0" x2="140" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="160" y1="0" x2="160" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="180" y1="0" x2="180" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                            <line x1="200" y1="0" x2="200" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+
+                            <!-- Axes -->
+                            <line x1="0" y1="100" x2="240" y2="100" stroke="#475569" stroke-width="2" />
+                            <line x1="120" y1="0" x2="120" y2="200" stroke="#475569" stroke-width="2" />
+
+                            <!-- Labels -->
+                            <text x="230" y="92" font-size="10" font-weight="bold" fill="#1e293b">X</text>
+                            <text x="126" y="15" font-size="10" font-weight="bold" fill="#1e293b">Y</text>
+                            <text x="160" y="112" font-size="9" fill="#64748b" text-anchor="middle">2</text>
+                            <text x="110" y="84" font-size="9" fill="#64748b" text-anchor="end">1</text>
+                            <text x="110" y="24" font-size="9" fill="#64748b" text-anchor="end">4</text>
+
+                            <!-- Piece 1: y = x - 1 for x <= 2 -->
+                            <line x1="40" y1="200" x2="160" y2="80" stroke="var(--primary-blue)" stroke-width="2.5" />
+                            <circle cx="160" cy="80" r="4.5" fill="var(--primary-blue)" />
+
+                            <!-- Piece 2: y = 4 for x > 2 -->
+                            <line x1="160" y1="20" x2="220" y2="20" stroke="var(--primary-blue)" stroke-width="2.5" />
+                            <circle cx="160" cy="20" r="5" fill="white" stroke="var(--primary-blue)" stroke-width="2.5" />
+                        </svg>
+
+                        <div class="info-card" style="margin:0; flex:1; border-left-color: var(--accent-red);">
+                            <p style="font-size:0.95rem; line-height:1.6; margin:0;">
+                                <strong>Límites laterales:</strong><br>
+                                * Por la izquierda (<em>x</em> &rarr; 2<sup>-</sup>): los valores de la curva tienden a <strong>1</strong>.<br>
+                                * Por la derecha (<em>x</em> &rarr; 2<sup>+</sup>): los valores de la recta plana tienden a <strong>4</strong>.<br>
+                                Como el límite por la izquierda (1) es distinto al de la derecha (4), se dice que <strong>el límite no existe</strong>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. Explorador Dinámico de Límites -->
+                <div class="slide">
+                    <h2 style="margin-bottom: 2px;">Explorador Dinámico de Límites</h2>
+                    <p style="font-size: 0.9rem; margin-bottom: 5px;">Mueve el deslizador de <em>x</em> para acercarte al punto de indeterminación <em>x</em> = 2 de la función <em>f</em>(<em>x</em>) = <span class="math-fraction"><span class="math-numerator">x&sup2; - 4</span><span class="math-denominator">x - 2</span></span>.</p>
+                    
+                    <div class="expl-layout">
+                        <!-- Controls -->
+                        <div class="expl-control">
+                            <div style="display:flex; flex-direction:column; gap:2px;">
+                                <label style="font-weight:bold; font-size:0.85rem; color:var(--primary-blue);" id="lbl-x">Valor de x = 1.00</label>
+                                <input type="range" id="slider-x" min="1.0" max="3.0" step="0.01" value="1.0" style="width:100%;" oninput="updateLimit()">
+                            </div>
+                            
+                            <table class="limit-table">
+                                <thead>
+                                    <tr>
+                                        <th>x (Por Izquierda &rarr;)</th>
+                                        <th>f(x)</th>
+                                        <th>x (&larr; Por Derecha)</th>
+                                        <th>f(x)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td id="t-xl1">1.90</td>
+                                        <td id="t-yl1">3.90</td>
+                                        <td id="t-xr1">2.10</td>
+                                        <td id="t-yr1">4.10</td>
+                                    </tr>
+                                    <tr>
+                                        <td id="t-xl2">1.99</td>
+                                        <td id="t-yl2">3.99</td>
+                                        <td id="t-xr2">2.01</td>
+                                        <td id="t-yr2">4.01</td>
+                                    </tr>
+                                    <tr>
+                                        <td id="t-xl3">1.999</td>
+                                        <td id="t-yl3">3.999</td>
+                                        <td id="t-xr3">2.001</td>
+                                        <td id="t-yr3">4.001</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Visualizer -->
+                        <div class="expl-visual">
+                            <svg width="240" height="200" style="background:#fdfaf6; border-radius:8px; border:1px solid #cbd5e1;">
+                                <!-- Grid lines -->
+                                <line x1="0" y1="20" x2="240" y2="20" stroke="#cbd5e1" stroke-width="0.5" />
+                                <line x1="0" y1="40" x2="240" y2="40" stroke="#cbd5e1" stroke-width="0.5" />
+                                <line x1="0" y1="60" x2="240" y2="60" stroke="#cbd5e1" stroke-width="0.5" />
+                                <line x1="0" y1="80" x2="240" y2="80" stroke="#cbd5e1" stroke-width="0.5" />
+                                <line x1="0" y1="120" x2="240" y2="120" stroke="#cbd5e1" stroke-width="0.5" />
+                                <line x1="0" y1="140" x2="240" y2="140" stroke="#cbd5e1" stroke-width="0.5" />
+                                <line x1="0" y1="160" x2="240" y2="160" stroke="#cbd5e1" stroke-width="0.5" />
+                                
+                                <line x1="20" y1="0" x2="20" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                                <line x1="40" y1="0" x2="40" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                                <line x1="60" y1="0" x2="60" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                                <line x1="80" y1="0" x2="80" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                                <line x1="100" y1="0" x2="100" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                                <line x1="140" y1="0" x2="140" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                                <line x1="160" y1="0" x2="160" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                                <line x1="180" y1="0" x2="180" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+                                <line x1="200" y1="0" x2="200" y2="200" stroke="#cbd5e1" stroke-width="0.5" />
+
+                                <!-- Axes -->
+                                <line x1="0" y1="100" x2="240" y2="100" stroke="#475569" stroke-width="2" />
+                                <line x1="120" y1="0" x2="120" y2="200" stroke="#475569" stroke-width="2" />
+                                
+                                <text x="230" y="92" font-size="10" font-weight="bold" fill="#1e293b">X</text>
+                                <text x="126" y="15" font-size="10" font-weight="bold" fill="#1e293b">Y</text>
+                                <text x="160" y="112" font-size="9" fill="#64748b" text-anchor="middle">2</text>
+                                <text x="110" y="24" font-size="9" fill="#64748b" text-anchor="end">4</text>
+
+                                <!-- Simplified line y = x + 2 -->
+                                <line x1="40" y1="160" x2="200" y2="0" stroke="var(--primary-teal)" stroke-width="2.5" />
+
+                                <!-- Dynamic points and labels -->
+                                <line id="dyn-line-x" x1="120" y1="100" x2="120" y2="100" stroke="#cbd5e1" stroke-dasharray="2,2" />
+                                <line id="dyn-line-y" x1="120" y1="100" x2="120" y2="100" stroke="#cbd5e1" stroke-dasharray="2,2" />
+                                <circle id="dyn-point" cx="120" cy="100" r="5" fill="var(--accent-red)" />
+                                <circle cx="160" cy="20" r="5" fill="white" stroke="var(--accent-red)" stroke-width="2.5" />
+                            </svg>
+                            
+                            <div id="dynamic-limit-output" style="font-size: 0.9rem; font-weight: bold; background: #fffbeb; padding: 4px 10px; border-radius: 8px; border: 1px dashed var(--primary-gold); width: 100%; text-align: center;">
+                                f(1.00) = 3.00
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 8. Quiz 1 -->
+                <div class="slide">
+                    <h2>Evaluación Teórica 1</h2>
+                    <p style="margin-bottom: 10px;">Si al observar la gráfica de una función <em>f</em>(<em>x</em>) vemos que en <em>x</em> = 3 hay un punto vacío (hueco) a una altura de <em>Y</em> = 5 y no hay ninguna otra rama en ese valor, ¿cuánto vale el límite de la función cuando <em>x</em> tiende a 3?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(1, true, this, '¡Correcto! El límite evalúa el comportamiento a los lados del punto. Aunque el punto esté vacío o f(3) no exista, el límite tiende a 5 por ambos lados.', '')">A) El límite vale 5.</button>
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'Incorrecto. Que f(3) no esté definida solo significa que la función es discontinua, pero el límite sí existe porque ambas ramas se acercan al mismo valor.')">B) El límite no existe porque la función no está definida en x=3.</button>
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'Incorrecto. Cero significaría que la curva se aproxima a la altura del eje X, lo cual contradice que el hueco esté a la altura Y=5.')">C) El límite vale 0.</button>
+                    </div>
+                    <div id="feedback-1" style="margin-top: 0.8rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 9. Quiz 2 -->
+                <div class="slide">
+                    <h2>Evaluación Teórica 2</h2>
+                    <p style="margin-bottom: 10px;">En una gráfica por trozos, si nos acercamos a <em>x</em>=1 por la izquierda y la función tiende a 2, pero al acercarnos por la derecha tiende a 5, ¿cuál es el límite general lim<sub>x &rarr; 1</sub> f(x)?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'Incorrecto. No se saca un promedio ni una media aritmética de los valores para obtener el límite general.')">A) El límite vale 3.5 (el promedio).</button>
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'Incorrecto. 5 es solo el límite lateral por la derecha, pero no representa el comportamiento por el lado izquierdo.')">B) El límite vale 5, por ser el valor más alto.</button>
+                        <button class="option-btn" onclick="checkQuiz(2, true, this, '¡Excelente! Para que exista el límite general, es una condición matemática indispensable que los límites por la izquierda y por la derecha sean exactamente iguales. Al ser distintos, el límite no existe.', '')">C) El límite no existe porque los límites laterales son distintos.</button>
+                    </div>
+                    <div id="feedback-2" style="margin-top: 0.8rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 10. Quiz 3 -->
+                <div class="slide">
+                    <h2>Evaluación Teórica 3</h2>
+                    <p style="margin-bottom: 10px;">¿Qué evalúa exactamente el límite lateral lim<sub>x &rarr; c<sup>-</sup></sub> f(x) de una función?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'Incorrecto. El superíndice negativo no significa evaluar números negativos, sino la dirección desde donde te aproximas.')">A) El valor de la función al evaluar únicamente números negativos menores que c.</button>
+                        <button class="option-btn" onclick="checkQuiz(3, true, this, '¡Correcto! El signo menos en el exponente (c⁻) indica que nos aproximamos al valor c desde valores menores que él en el eje X, es decir, de izquierda a derecha.', '')">B) El comportamiento de la función a medida que x se aproxima a c por la izquierda.</button>
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'Incorrecto. Acercarse por la derecha se representa con el símbolo c⁺.')">C) El comportamiento de la función a medida que x se aproxima a c por la derecha.</button>
+                    </div>
+                    <div id="feedback-3" style="margin-top: 0.8rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 11. Final -->
+                <div class="slide">
+                    <div style="font-size: 4.5rem;">🎯</div>
+                    <h2>¡Misión Cumplida!</h2>
+                    <p>¡Eres un experto analizando límites de funciones tanto de forma tabular como mediante su representación gráfica!</p>
+                    <button onclick="goToSlide(0)"
+                        style="background: var(--primary-gold); color: white; border: none; padding: 0.8rem 1.8rem; border-radius: 30px; font-weight: 700; cursor: pointer; margin-top: 1rem; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Volver al inicio</button>
+                </div>
+
+            </div>
+        </div>
+
+        <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled aria-label="Anterior">&#8592;</button>
+        <button class="nav-btn" id="next-btn" onclick="nextSlide()" aria-label="Siguiente">&#8594;</button>
+
+        <div class="slide-indicators">
+            <span id="slide-num">1 / 11</span>
+        </div>
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const container = document.getElementById('slide-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const slideNum = document.getElementById('slide-num');
+        const progressBar = document.getElementById('progress-bar');
+
+        function updateGallery() {
+            container.style.transform = `translateX(-${currentSlide * 100}%)`;
+            slides.forEach((slide, index) => slide.classList.toggle('active', index === currentSlide));
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+            slideNum.innerText = `${currentSlide + 1} / ${slides.length}`;
+            progressBar.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+        }
+
+        function nextSlide() { if (currentSlide < slides.length - 1) { currentSlide++; updateGallery(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateGallery(); } }
+        function goToSlide(n) { currentSlide = n; updateGallery(); }
+
+        document.addEventListener('keydown', e => { 
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide(); 
+            if (e.key === 'ArrowLeft') prevSlide(); 
+        });
+
+        // Widget logic
+        function updateLimit() {
+            const xVal = parseFloat(document.getElementById('slider-x').value);
+            document.getElementById('lbl-x').innerText = `Valor de x = ${xVal.toFixed(2)}`;
+
+            // f(x) = x + 2 (simplified version of (x^2-4)/(x-2))
+            const yVal = xVal + 2;
+
+            // Map xVal to SVG scale: center is (120, 100). scale is 20px per unit.
+            const cx = 120 + (xVal * 20);
+            const cy = 100 - (yVal * 20);
+
+            const pt = document.getElementById('dyn-point');
+            pt.setAttribute('cx', cx);
+            pt.setAttribute('cy', cy);
+
+            const lx = document.getElementById('dyn-line-x');
+            lx.setAttribute('x1', cx);
+            lx.setAttribute('y1', cy);
+            lx.setAttribute('x2', cx);
+            lx.setAttribute('y2', 100);
+
+            const ly = document.getElementById('dyn-line-y');
+            ly.setAttribute('x1', cx);
+            ly.setAttribute('y1', cy);
+            ly.setAttribute('x2', 120);
+            ly.setAttribute('y2', cy);
+
+            document.getElementById('dynamic-limit-output').innerHTML = `f(${xVal.toFixed(2)}) = ${yVal.toFixed(2)}`;
+
+            // Update Tables
+            document.getElementById('t-xl1').innerText = (2 - 0.1).toFixed(3);
+            document.getElementById('t-yl1').innerText = ((2 - 0.1) + 2).toFixed(3);
+            document.getElementById('t-xr1').innerText = (2 + 0.1).toFixed(3);
+            document.getElementById('t-yr1').innerText = ((2 + 0.1) + 2).toFixed(3);
+
+            document.getElementById('t-xl2').innerText = (2 - 0.01).toFixed(3);
+            document.getElementById('t-yl2').innerText = ((2 - 0.01) + 2).toFixed(3);
+            document.getElementById('t-xr2').innerText = (2 + 0.01).toFixed(3);
+            document.getElementById('t-yr2').innerText = ((2 + 0.01) + 2).toFixed(3);
+
+            document.getElementById('t-xl3').innerText = (2 - 0.001).toFixed(3);
+            document.getElementById('t-yl3').innerText = ((2 - 0.001) + 2).toFixed(3);
+            document.getElementById('t-xr3').innerText = (2 + 0.001).toFixed(3);
+            document.getElementById('t-yr3').innerText = ((2 + 0.001) + 2).toFixed(3);
+        }
+
+        // Quiz Logic
+        function checkQuiz(qId, isCorrect, btn, correctMsg, incorrectMsg) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const containerOpts = btn.parentElement;
+
+            if (isCorrect) {
+                containerOpts.querySelectorAll('.option-btn').forEach(b => {
+                    b.disabled = true;
+                    b.style.opacity = "0.5";
+                });
+                btn.disabled = false;
+                btn.style.opacity = "1";
+                btn.style.background = "#dcfce7";
+                btn.style.borderColor = "#10b981";
+                btn.style.color = "#065f46";
+                feedback.innerHTML = `✅ ¡Correcto! ${correctMsg}`;
+                feedback.style.color = "#10b981";
+            } else {
+                btn.style.background = "#fee2e2";
+                btn.style.borderColor = "#dc2626";
+                btn.style.color = "#9f1239";
+                btn.disabled = true;
+                feedback.innerHTML = `❌ <span>${incorrectMsg}</span> <button onclick="resetQuiz(${qId})" style="margin-left:10px; background:var(--primary-slate); color:white; border:none; padding:4px 10px; border-radius:6px; cursor:pointer; font-size:0.8rem;">Reintentar</button>`;
+                feedback.style.color = "#dc2626";
+            }
+        }
+
+        function resetQuiz(qId) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const containerOpts = feedback.parentElement.querySelector('.quiz-container');
+            containerOpts.querySelectorAll('.option-btn').forEach(b => {
+                b.disabled = false;
+                b.style.opacity = "1";
+                b.style.background = "white";
+                b.style.borderColor = "#cbd5e1";
+                b.style.color = "var(--primary-slate)";
+            });
+            feedback.innerHTML = "";
+        }
+
+        updateLimit();
+        updateGallery();
+    </script>
+</body>
+
+</html>

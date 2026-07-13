@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía 21: Cálculo de Derivación - 5to Bachillerato</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-blue: #1e3a8a;
+            --primary-gold: #b45309;
+            --primary-teal: #0f766e;
+            --primary-slate: #334155;
+            --accent-red: #be123c;
+            --bg-light: #f8fafc;
+            --transition-speed: 0.5s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #cbd5e1;
+            color: #0f172a;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 1024px;
+            height: 600px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: auto;
+        }
+
+        header {
+            background-color: var(--primary-slate);
+            color: white;
+            padding: 0 1.5rem;
+            height: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+            font-weight: 500;
+            z-index: 200;
+            letter-spacing: 0.5px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        #viewport {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        @media (max-height: 650px) or (max-width: 1024px) {
+            #app-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+
+        .slide-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            padding: 10px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6rem;
+            color: var(--primary-teal);
+            margin-bottom: 0.4rem;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 1.02rem;
+            color: #334155;
+            max-width: 820px;
+            line-height: 1.45;
+            margin-bottom: 0.3rem;
+        }
+
+        .info-card {
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            background: #f1f5f9;
+            margin: 0.4rem 0;
+            width: 100%;
+            max-width: 780px;
+            text-align: left;
+            border-left: 5px solid var(--primary-blue);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+            line-height: 1.5;
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease;
+            z-index: 250;
+            border: 1px solid #e2e8f0;
+            color: var(--primary-slate);
+            font-size: 1.5rem;
+            user-select: none;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-50%) scale(1.1);
+            background-color: #f8fafc;
+            color: var(--primary-blue);
+            border-color: var(--primary-blue);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #prev-btn {
+            left: 20px;
+        }
+
+        #next-btn {
+            right: 20px;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            padding: 0;
+            bottom: 1.5rem;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: #64748b;
+            z-index: 100;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 6px;
+            background: var(--primary-gold);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 100%;
+            max-width: 650px;
+            margin: 0.5rem auto 0;
+        }
+
+        .option-btn {
+            padding: 0.7rem 1.1rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            color: var(--primary-slate);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-blue);
+            background: #f0f9ff;
+        }
+
+        .expl-layout {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 820px;
+            margin-top: 5px;
+            height: 310px;
+        }
+
+        .expl-control {
+            flex: 1.1;
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 10px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            text-align: left;
+            justify-content: center;
+        }
+
+        .expl-visual {
+            flex: 1.1;
+            background: white;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .math-fraction {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            margin: 0 4px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: bold;
+            color: var(--primary-blue);
+            text-align: center;
+            line-height: 1.1;
+            font-size: 1.05rem;
+        }
+
+        .math-numerator {
+            border-bottom: 2px solid currentColor;
+            padding: 0 4px;
+            width: 100%;
+        }
+
+        .math-denominator {
+            padding: 2px 4px 0 4px;
+            width: 100%;
+        }
+
+        .coeff-input {
+            width: 50px;
+            padding: 2px 4px;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.9rem;
+            outline: none;
+            font-family: 'Outfit', sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app-container">
+        <header id="global-header">
+            <span>Colegio Escolaris - Matemática 5to Bachillerato</span>
+            <span>Guía 21: Cálculo de Derivación</span>
+        </header>
+
+        <div id="viewport">
+            <div class="slide-container" id="slide-container">
+
+                <!-- 1. Portada -->
+                <div class="slide active">
+                    <div style="font-size: 4rem; margin-bottom: 15px;">⚡⚙️🔢</div>
+                    <h1>Cálculo de Derivación</h1>
+                    <h2>Reglas de Operación y Algoritmos Prácticos</h2>
+                    <p style="color: #64748b; font-style: italic; margin-top: 0.5rem;">Domina las fórmulas fundamentales para derivar funciones polinómicas, productos, cocientes, compuestas y trigonométricas.</p>
+                </div>
+
+                <!-- 2. Objetivos -->
+                <div class="slide">
+                    <h2>¿Qué aprenderemos hoy?</h2>
+                    <div class="info-card" style="border-left-color: var(--primary-blue); background: #f8fafc; max-width: 600px;">
+                        <ul style="list-style-type: none; font-size: 1.1rem; line-height: 1.8; color: var(--primary-slate);">
+                            <li>✍️ <strong>Aplicar</strong> las reglas de potencia, suma y producto para derivar polinomios.</li>
+                            <li>🔄 <strong>Resolver</strong> derivados por cociente y regla de la cadena.</li>
+                            <li>📐 <strong>Calcular</strong> derivadas de funciones trigonométricas combinadas.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 3. Reglas Básicas y Polinomios -->
+                <div class="slide">
+                    <h2>1. Derivada de Polinomios</h2>
+                    <p style="margin-bottom: 5px;">Las reglas básicas nos evitan usar límites para cada cálculo:</p>
+                    <div class="info-card" style="border-left-color: var(--primary-teal); background: #f0fdf5; font-size: 0.9rem; padding: 6px 15px; margin-bottom: 5px; max-width:780px;">
+                        * <strong>Constante:</strong> (c)' = 0 &bull; <strong>Potencia:</strong> (x<sup>n</sup>)' = n &bull; x<sup>n-1</sup> &bull; <strong>Factor Constante:</strong> (c &bull; f)' = c &bull; f'
+                    </div>
+                    
+                    <div style="font-family:'Outfit'; font-size:1.4rem; font-weight:bold; margin-top:5px; margin-bottom:8px; color:var(--primary-slate); letter-spacing:0.5px;">
+                        f(x) = <span id="p-term-1">5x<sup>4</sup></span> <span id="p-term-2">- 3x<sup>2</sup></span> <span id="p-term-3">+ 7x</span> <span id="p-term-4">- 9</span>
+                    </div>
+
+                    <div class="info-card" style="border-left-color: var(--primary-blue); background: #f8fafc; min-height: 96px; width:100%; max-width:780px; box-sizing:border-box; margin: 5px 0;">
+                        <div id="p-step-title" style="font-weight:700; color:var(--primary-blue); font-size:1.05rem; margin-bottom:3px; font-family:'Outfit';">Paso 1: Iniciando...</div>
+                        <div id="p-step-desc" style="font-size:0.95rem; color:var(--primary-slate); line-height:1.4;">Cargando descripción del paso...</div>
+                    </div>
+
+                    <div style="font-family:'Outfit'; font-size:1.35rem; font-weight:bold; color:var(--primary-blue); margin-top:5px;">
+                        f'(x) = <span id="p-deriv-accum" style="color:var(--accent-red);">...</span>
+                    </div>
+
+                    <div style="display:flex; gap:12px; margin-top:10px;">
+                        <button id="btn-p-prev" onclick="prevPolyStep()" style="background:var(--primary-slate); color:white; border:none; padding:6px 15px; border-radius:15px; cursor:pointer; font-weight:bold; font-size:0.9rem; outline:none;">&larr; Anterior</button>
+                        <button id="btn-p-next" onclick="nextPolyStep()" style="background:var(--primary-gold); color:white; border:none; padding:6px 15px; border-radius:15px; cursor:pointer; font-weight:bold; font-size:0.9rem; outline:none;">Siguiente</button>
+                    </div>
+                </div>
+
+                <!-- 4. Regla del Producto -->
+                <div class="slide">
+                    <h2>2. La Regla del Producto</h2>
+                    <p style="margin-bottom: 2px; font-size:0.95rem;">Si multiplicamos dos funciones, aplicamos: <strong>(u &bull; v)' = u' &bull; v + u &bull; v'</strong></p>
+                    
+                    <div style="display:flex; width:100%; max-width:850px; gap:15px; align-items:stretch; text-align:left; height:280px; margin-top:5px;">
+                        <!-- Left: Math steps -->
+                        <div style="flex:1; background:#f8fafc; border:2px solid #cbd5e1; border-radius:12px; padding:15px; display:flex; flex-direction:column; justify-content:center; gap:8px;">
+                            <div style="font-family:'Outfit'; font-size:1.15rem; font-weight:700; color:var(--primary-slate);">Función a derivar:</div>
+                            <div style="font-family:'Outfit'; font-size:1.3rem; font-weight:bold; color:var(--primary-blue); background:white; padding:8px 12px; border-radius:8px; border:1px solid #e2e8f0; text-align:center;">
+                                f(x) = <span id="prod-f-expr">(3x<sup>2</sup> + 1)(x - 2)</span>
+                            </div>
+                            <div id="prod-math-deriv" style="font-family:'Outfit'; font-size:1.05rem; line-height:1.4; color:var(--primary-slate); min-height:80px; padding:5px 0;">
+                                <!-- filled dynamically -->
+                            </div>
+                            <div style="font-family:'Outfit'; font-size:1.25rem; font-weight:bold; color:var(--primary-blue);">
+                                f'(x) = <span id="prod-deriv-accum" style="color:var(--accent-red);">...</span>
+                            </div>
+                        </div>
+
+                        <!-- Right: Explanations and local stepper controls -->
+                        <div style="flex:1.1; background:white; border:2px solid #cbd5e1; border-radius:12px; padding:15px; display:flex; flex-direction:column; justify-content:space-between; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                            <div>
+                                <div id="prod-step-title" style="font-weight:700; color:var(--primary-gold); font-size:1.1rem; margin-bottom:5px; font-family:'Outfit';">Paso 1: Iniciando...</div>
+                                <div id="prod-step-desc" style="font-size:0.92rem; color:var(--primary-slate); line-height:1.45;">Cargando descripción...</div>
+                            </div>
+                            <div style="display:flex; gap:10px; margin-top:10px;">
+                                <button id="btn-prod-prev" onclick="prevProdStep()" style="background:var(--primary-slate); color:white; border:none; padding:6px 12px; border-radius:15px; cursor:pointer; font-weight:bold; font-size:0.85rem; outline:none;">&larr; Anterior</button>
+                                <button id="btn-prod-next" onclick="nextProdStep()" style="background:var(--primary-gold); color:white; border:none; padding:6px 12px; border-radius:15px; cursor:pointer; font-weight:bold; font-size:0.85rem; outline:none;">Siguiente</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Regla del Cociente -->
+                <div class="slide">
+                    <h2>3. La Regla del Cociente</h2>
+                    <p style="margin-bottom: 2px; font-size:0.95rem;">Para una división aplicamos: <strong>(u/v)' = (u' &bull; v - u &bull; v') / v²</strong></p>
+                    
+                    <div style="display:flex; width:100%; max-width:850px; gap:15px; align-items:stretch; text-align:left; height:280px; margin-top:5px;">
+                        <!-- Left: Math steps -->
+                        <div style="flex:1; background:#f8fafc; border:2px solid #cbd5e1; border-radius:12px; padding:15px; display:flex; flex-direction:column; justify-content:center; gap:8px;">
+                            <div style="font-family:'Outfit'; font-size:1.15rem; font-weight:700; color:var(--primary-slate);">Función a derivar:</div>
+                            <div style="font-family:'Outfit'; font-size:1.25rem; font-weight:bold; color:var(--primary-blue); background:white; padding:6px 12px; border-radius:8px; border:1px solid #e2e8f0; text-align:center;">
+                                f(x) = <span class="math-fraction"><span class="math-numerator">2x - 5</span><span class="math-denominator">3x + 4</span></span>
+                            </div>
+                            <div id="quot-math-deriv" style="font-family:'Outfit'; font-size:1rem; line-height:1.4; color:var(--primary-slate); min-height:85px; padding:5px 0;">
+                                <!-- filled dynamically -->
+                            </div>
+                            <div style="font-family:'Outfit'; font-size:1.2rem; font-weight:bold; color:var(--primary-blue);">
+                                f'(x) = <span id="quot-deriv-accum" style="color:var(--accent-red);">...</span>
+                            </div>
+                        </div>
+
+                        <!-- Right: Explanations and local stepper controls -->
+                        <div style="flex:1.1; background:white; border:2px solid #cbd5e1; border-radius:12px; padding:15px; display:flex; flex-direction:column; justify-content:space-between; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                            <div>
+                                <div id="quot-step-title" style="font-weight:700; color:var(--accent-red); font-size:1.1rem; margin-bottom:5px; font-family:'Outfit';">Paso 1: Iniciando...</div>
+                                <div id="quot-step-desc" style="font-size:0.92rem; color:var(--primary-slate); line-height:1.45;">Cargando descripción...</div>
+                            </div>
+                            <div style="display:flex; gap:10px; margin-top:10px;">
+                                <button id="btn-quot-prev" onclick="prevQuotStep()" style="background:var(--primary-slate); color:white; border:none; padding:6px 12px; border-radius:15px; cursor:pointer; font-weight:bold; font-size:0.85rem; outline:none;">&larr; Anterior</button>
+                                <button id="btn-quot-next" onclick="nextQuotStep()" style="background:var(--primary-gold); color:white; border:none; padding:6px 12px; border-radius:15px; cursor:pointer; font-weight:bold; font-size:0.85rem; outline:none;">Siguiente</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. Regla de la Cadena -->
+                <div class="slide">
+                    <h2>4. La Regla de la Cadena</h2>
+                    <p style="margin-bottom: 2px; font-size:0.95rem;">Para funciones compuestas aplicamos: <strong>[f(g(x))]' = f'(g(x)) &bull; g'(x)</strong></p>
+                    
+                    <div style="display:flex; width:100%; max-width:850px; gap:15px; align-items:stretch; text-align:left; height:280px; margin-top:5px;">
+                        <!-- Left: Math steps -->
+                        <div style="flex:1; background:#f8fafc; border:2px solid #cbd5e1; border-radius:12px; padding:15px; display:flex; flex-direction:column; justify-content:center; gap:8px;">
+                            <div style="font-family:'Outfit'; font-size:1.15rem; font-weight:700; color:var(--primary-slate);">Función a derivar:</div>
+                            <div style="font-family:'Outfit'; font-size:1.3rem; font-weight:bold; color:var(--primary-blue); background:white; padding:8px 12px; border-radius:8px; border:1px solid #e2e8f0; text-align:center;">
+                                f(x) = <span id="chain-f-expr">(4x<sup>2</sup> - 3)<sup>5</sup></span>
+                            </div>
+                            <div id="chain-math-deriv" style="font-family:'Outfit'; font-size:1.05rem; line-height:1.4; color:var(--primary-slate); min-height:80px; padding:5px 0;">
+                                <!-- filled dynamically -->
+                            </div>
+                            <div style="font-family:'Outfit'; font-size:1.25rem; font-weight:bold; color:var(--primary-blue);">
+                                f'(x) = <span id="chain-deriv-accum" style="color:var(--accent-red);">...</span>
+                            </div>
+                        </div>
+
+                        <!-- Right: Explanations and local stepper controls -->
+                        <div style="flex:1.1; background:white; border:2px solid #cbd5e1; border-radius:12px; padding:15px; display:flex; flex-direction:column; justify-content:space-between; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                            <div>
+                                <div id="chain-step-title" style="font-weight:700; color:var(--primary-teal); font-size:1.1rem; margin-bottom:5px; font-family:'Outfit';">Paso 1: Iniciando...</div>
+                                <div id="chain-step-desc" style="font-size:0.92rem; color:var(--primary-slate); line-height:1.45;">Cargando descripción...</div>
+                            </div>
+                            <div style="display:flex; gap:10px; margin-top:10px;">
+                                <button id="btn-chain-prev" onclick="prevChainStep()" style="background:var(--primary-slate); color:white; border:none; padding:6px 12px; border-radius:15px; cursor:pointer; font-weight:bold; font-size:0.85rem; outline:none;">&larr; Anterior</button>
+                                <button id="btn-chain-next" onclick="nextChainStep()" style="background:var(--primary-gold); color:white; border:none; padding:6px 12px; border-radius:15px; cursor:pointer; font-weight:bold; font-size:0.85rem; outline:none;">Siguiente</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. Derivadas Trigonométricas -->
+                <div class="slide">
+                    <h2>5. Derivadas de Seno y Coseno</h2>
+                    <p style="margin-bottom: 2px; font-size:0.95rem;">Derivadas fundamentales: <strong>(sin x)' = cos x</strong> &nbsp;|&nbsp; <strong>(cos x)' = -sin x</strong></p>
+                    
+                    <div style="display:flex; width:100%; max-width:850px; gap:15px; align-items:stretch; text-align:left; height:280px; margin-top:5px;">
+                        <!-- Left: Math steps -->
+                        <div style="flex:1; background:#f8fafc; border:2px solid #cbd5e1; border-radius:12px; padding:15px; display:flex; flex-direction:column; justify-content:center; gap:8px;">
+                            <div style="font-family:'Outfit'; font-size:1.15rem; font-weight:700; color:var(--primary-slate);">Función a derivar:</div>
+                            <div style="font-family:'Outfit'; font-size:1.3rem; font-weight:bold; color:var(--primary-blue); background:white; padding:8px 12px; border-radius:8px; border:1px solid #e2e8f0; text-align:center;">
+                                f(x) = <span id="trig-f-expr">3 sin(x) - 4 cos(x)</span>
+                            </div>
+                            <div id="trig-math-deriv" style="font-family:'Outfit'; font-size:1.05rem; line-height:1.4; color:var(--primary-slate); min-height:80px; padding:5px 0;">
+                                <!-- filled dynamically -->
+                            </div>
+                            <div style="font-family:'Outfit'; font-size:1.25rem; font-weight:bold; color:var(--primary-blue);">
+                                f'(x) = <span id="trig-deriv-accum" style="color:var(--accent-red);">...</span>
+                            </div>
+                        </div>
+
+                        <!-- Right: Explanations and local stepper controls -->
+                        <div style="flex:1.1; background:white; border:2px solid #cbd5e1; border-radius:12px; padding:15px; display:flex; flex-direction:column; justify-content:space-between; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
+                            <div>
+                                <div id="trig-step-title" style="font-weight:700; color:var(--primary-gold); font-size:1.1rem; margin-bottom:5px; font-family:'Outfit';">Paso 1: Iniciando...</div>
+                                <div id="trig-step-desc" style="font-size:0.92rem; color:var(--primary-slate); line-height:1.45;">Cargando descripción...</div>
+                            </div>
+                            <div style="display:flex; gap:10px; margin-top:10px;">
+                                <button id="btn-trig-prev" onclick="prevTrigStep()" style="background:var(--primary-slate); color:white; border:none; padding:6px 12px; border-radius:15px; cursor:pointer; font-weight:bold; font-size:0.85rem; outline:none;">&larr; Anterior</button>
+                                <button id="btn-trig-next" onclick="nextTrigStep()" style="background:var(--primary-gold); color:white; border:none; padding:6px 12px; border-radius:15px; cursor:pointer; font-weight:bold; font-size:0.85rem; outline:none;">Siguiente</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 8. Widget Interactivo -->
+                <div class="slide">
+                    <h2 style="margin-bottom: 2px;">Calculadora de Derivadas Polinómicas</h2>
+                    <p style="font-size: 0.9rem; margin-bottom: 4px;">Ajusta los coeficientes para la función cúbica <em>f</em>(<em>x</em>) = <em>A</em><em>x</em><sup>3</sup> + <em>B</em><em>x</em><sup>2</sup> + <em>C</em><em>x</em> + <em>D</em> y observa la regla de potencia.</p>
+                    
+                    <div class="expl-layout">
+                        <!-- Controls -->
+                        <div class="expl-control">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <label style="font-weight:bold; font-size:0.8rem; color:var(--primary-blue);" id="lbl-a">Coeficiente A = 3</label>
+                                <input type="number" id="val-a" class="coeff-input" value="3" oninput="calcDeriv()">
+                            </div>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <label style="font-weight:bold; font-size:0.8rem; color:var(--primary-teal);" id="lbl-b">Coeficiente B = -5</label>
+                                <input type="number" id="val-b" class="coeff-input" value="-5" oninput="calcDeriv()">
+                            </div>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <label style="font-weight:bold; font-size:0.8rem; color:var(--primary-gold);" id="lbl-c">Coeficiente C = 2</label>
+                                <input type="number" id="val-c" class="coeff-input" value="2" oninput="calcDeriv()">
+                            </div>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <label style="font-weight:bold; font-size:0.8rem; color:var(--primary-slate);" id="lbl-d">Constante D = -7</label>
+                                <input type="number" id="val-d" class="coeff-input" value="-7" oninput="calcDeriv()">
+                            </div>
+                        </div>
+
+                        <!-- Visualizer -->
+                        <div class="expl-visual">
+                            <div style="font-family:'Outfit'; font-size: 1.1rem; text-align: left; line-height: 1.6; color: var(--primary-slate);">
+                                <strong>Función original:</strong><br>
+                                f(x) = <span id="f-expr">3x³ - 5x² + 2x - 7</span><br><br>
+                                <strong>Paso Intermedio (Regla de Potencia):</strong><br>
+                                f'(x) = <span id="f-step" style="font-size:0.95rem; color: var(--primary-teal);">3(3x²) - 5(2x) + 2(1) - 0</span><br><br>
+                                <strong>Derivada Final:</strong><br>
+                                <span style="font-size: 1.25rem; font-weight: bold; color: var(--accent-red);">f'(x) = <span id="f-final">9x² - 10x + 2</span></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 9. Quiz 1 -->
+                <div class="slide">
+                    <h2>Evaluación Teórica 1</h2>
+                    <p style="margin-bottom: 10px;">Si aplicamos la regla de la cadena para derivar la función compuesta <em>f</em>(<em>x</em>) = sin(5<em>x</em><sup>2</sup>), ¿cuál es el resultado correcto?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'Incorrecto. Te faltó multiplicar por la derivada de la función interna 5x², que es 10x.')">A) f'(x) = \cos(5x^2)</button>
+                        <button class="option-btn" onclick="checkQuiz(1, true, this, '¡Correcto! Derivada externa es cos(5x²), y la multiplicamos por la derivada interna d/dx[5x²] = 10x. Resultado: 10x &bull; cos(5x²).', '')">B) f'(x) = 10x &bull; \cos(5x^2)</button>
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'Incorrecto. Derivaste la función interna pero cambiaste el argumento del coseno de forma errónea.')">C) f'(x) = 10x &bull; \cos(10x)</button>
+                    </div>
+                    <div id="feedback-1" style="margin-top: 0.8rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 10. Quiz 2 -->
+                <div class="slide">
+                    <h2>Evaluación Teórica 2</h2>
+                    <p style="margin-bottom: 10px;">¿Cuál es la diferencia fundamental en la estructura del numerador entre la regla del producto y la regla del cociente?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(2, true, this, '¡Correcto! La regla del producto suma los dos términos (u&apos;v + uv&apos;) mientras que la regla del cociente los resta (u&apos;v - uv&apos;) en el numerador.', '')">A) La regla del producto suma los términos intermedios y la del cociente los resta.</button>
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'Incorrecto. Ambas reglas evalúan las derivadas individuales cruzadas, cambian únicamente los signos operativos.')">B) La del producto deriva el denominador y la del cociente el numerador.</button>
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'Incorrecto. La del cociente requiere obligatoriamente dividir entre v², no multiplicar.')">C) La regla del producto multiplica el resultado por v².</button>
+                    </div>
+                    <div id="feedback-2" style="margin-top: 0.8rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 11. Quiz 3 -->
+                <div class="slide">
+                    <h2>Evaluación Teórica 3</h2>
+                    <p style="margin-bottom: 10px;">¿Cuál es la derivada de la función combinada <em>f</em>(<em>x</em>) = 2 cos(<em>x</em>) - sin(<em>x</em>)?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'Incorrecto. Recuerda que la derivada de cos(x) es -sin(x).')">A) f'(x) = 2\sin(x) - \cos(x)</button>
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'Incorrecto. Recuerda que la derivada de sin(x) es cos(x), por lo que el signo de este término no cambia a positivo.')">B) f'(x) = -2\sin(x) + \cos(x)</button>
+                        <button class="option-btn" onclick="checkQuiz(3, true, this, '¡Excelente! Derivada de 2cos(x) es -2sin(x); derivada de -sin(x) es -cos(x). Ambos términos quedan negativos.', '')">C) f'(x) = -2\sin(x) - \cos(x)</button>
+                    </div>
+                    <div id="feedback-3" style="margin-top: 0.8rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 12. Final -->
+                <div class="slide">
+                    <div style="font-size: 4.5rem;">🎯</div>
+                    <h2>¡Misión Cumplida!</h2>
+                    <p>¡Felicidades! Has dominado el cálculo de derivación para polinomios, productos, cocientes, compuestas y trigonométricas.</p>
+                    <button onclick="goToSlide(0)"
+                        style="background: var(--primary-gold); color: white; border: none; padding: 0.8rem 1.8rem; border-radius: 30px; font-weight: 700; cursor: pointer; margin-top: 1rem; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Volver al inicio</button>
+                </div>
+
+            </div>
+        </div>
+
+        <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled aria-label="Anterior">&#8592;</button>
+        <button class="nav-btn" id="next-btn" onclick="nextSlide()" aria-label="Siguiente">&#8594;</button>
+
+        <div class="slide-indicators">
+            <span id="slide-num">1 / 12</span>
+        </div>
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const container = document.getElementById('slide-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const slideNum = document.getElementById('slide-num');
+        const progressBar = document.getElementById('progress-bar');
+
+        function updateGallery() {
+            container.style.transform = `translateX(-${currentSlide * 100}%)`;
+            slides.forEach((slide, index) => slide.classList.toggle('active', index === currentSlide));
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+            slideNum.innerText = `${currentSlide + 1} / ${slides.length}`;
+            progressBar.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+        }
+
+        function nextSlide() { if (currentSlide < slides.length - 1) { currentSlide++; updateGallery(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateGallery(); } }
+        function goToSlide(n) { currentSlide = n; updateGallery(); }
+
+        document.addEventListener('keydown', e => { 
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide(); 
+            if (e.key === 'ArrowLeft') prevSlide(); 
+        });
+
+        // Widget logic
+        function formatTerm(coeff, power, isFirst) {
+            if (coeff === 0) return "";
+            let sign = coeff > 0 ? " + " : " - ";
+            if (isFirst) {
+                sign = coeff > 0 ? "" : "-";
+            }
+            let absCoeff = Math.abs(coeff);
+            let coeffStr = absCoeff === 1 && power > 0 ? "" : absCoeff.toString();
+            
+            if (power === 0) {
+                return sign + absCoeff.toString();
+            } else if (power === 1) {
+                return sign + coeffStr + "x";
+            } else {
+                return sign + coeffStr + "x<sup>" + power + "</sup>";
+            }
+        }
+
+        function calcDeriv() {
+            const a = parseFloat(document.getElementById('val-a').value) || 0;
+            const b = parseFloat(document.getElementById('val-b').value) || 0;
+            const c = parseFloat(document.getElementById('val-c').value) || 0;
+            const d = parseFloat(document.getElementById('val-d').value) || 0;
+
+            document.getElementById('lbl-a').innerText = `Coeficiente A = ${a}`;
+            document.getElementById('lbl-b').innerText = `Coeficiente B = ${b}`;
+            document.getElementById('lbl-c').innerText = `Coeficiente C = ${c}`;
+            document.getElementById('lbl-d').innerText = `Constante D = ${d}`;
+
+            // Build original expression
+            let origStr = formatTerm(a, 3, true);
+            origStr += formatTerm(b, 2, origStr === "");
+            origStr += formatTerm(c, 1, origStr === "");
+            origStr += formatTerm(d, 0, origStr === "");
+            if (origStr === "") origStr = "0";
+            document.getElementById('f-expr').innerHTML = origStr;
+
+            // Step expression
+            let stepStr = "";
+            if (a !== 0) stepStr += `${a}(3x²)`;
+            if (b !== 0) {
+                const sign = b > 0 ? " + " : " - ";
+                stepStr += (stepStr === "" ? (b > 0 ? "" : "-") : sign) + `${Math.abs(b)}(2x)`;
+            }
+            if (c !== 0) {
+                const sign = c > 0 ? " + " : " - ";
+                stepStr += (stepStr === "" ? (c > 0 ? "" : "-") : sign) + `${Math.abs(c)}(1)`;
+            }
+            if (d !== 0) {
+                stepStr += " - 0";
+            }
+            if (stepStr === "") stepStr = "0";
+            document.getElementById('f-step').innerHTML = stepStr;
+
+            // Final derivative: f'(x) = (3a)x^2 + (2b)x + c
+            const newA = 3 * a;
+            const newB = 2 * b;
+            const newC = c;
+
+            let finalStr = formatTerm(newA, 2, true);
+            finalStr += formatTerm(newB, 1, finalStr === "");
+            finalStr += formatTerm(newC, 0, finalStr === "");
+            if (finalStr === "") finalStr = "0";
+            document.getElementById('f-final').innerHTML = finalStr;
+        }
+
+        // Quiz Logic
+        function checkQuiz(qId, isCorrect, btn, correctMsg, incorrectMsg) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const containerOpts = btn.parentElement;
+
+            if (isCorrect) {
+                containerOpts.querySelectorAll('.option-btn').forEach(b => {
+                    b.disabled = true;
+                    b.style.opacity = "0.5";
+                });
+                btn.disabled = false;
+                btn.style.opacity = "1";
+                btn.style.background = "#dcfce7";
+                btn.style.borderColor = "#10b981";
+                btn.style.color = "#065f46";
+                feedback.innerHTML = `✅ ¡Correcto! ${correctMsg}`;
+                feedback.style.color = "#10b981";
+            } else {
+                btn.style.background = "#fee2e2";
+                btn.style.borderColor = "#dc2626";
+                btn.style.color = "#9f1239";
+                btn.disabled = true;
+                feedback.innerHTML = `❌ <span>${incorrectMsg}</span> <button onclick="resetQuiz(${qId})" style="margin-left:10px; background:var(--primary-slate); color:white; border:none; padding:4px 10px; border-radius:6px; cursor:pointer; font-size:0.8rem;">Reintentar</button>`;
+                feedback.style.color = "#dc2626";
+            }
+        }
+
+        function resetQuiz(qId) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const containerOpts = feedback.parentElement.querySelector('.quiz-container');
+            containerOpts.querySelectorAll('.option-btn').forEach(b => {
+                b.disabled = false;
+                b.style.opacity = "1";
+                b.style.background = "white";
+                b.style.borderColor = "#cbd5e1";
+                b.style.color = "var(--primary-slate)";
+            });
+            feedback.innerHTML = "";
+        }
+
+        // Poly step-by-step differentiation logic
+        let polyStep = 0;
+        const polyTerms = [
+            {
+                highlight: 0,
+                title: "Introducción al Ejemplo",
+                desc: "Vamos a calcular la derivada de <em>f</em>(<em>x</em>) = 5<em>x</em><sup>4</sup> - 3<em>x</em><sup>2</sup> + 7<em>x</em> - 9 término a término de izquierda a derecha. Utiliza el botón <strong>Siguiente</strong> para iniciar.",
+                accum: "..."
+            },
+            {
+                highlight: 1,
+                title: "Término 1: Derivando 5x⁴",
+                desc: "<strong>Regla de la Potencia y Factor Constante</strong>:<br>El exponente 4 baja multiplicando al coeficiente 5, y el exponente se reduce en 1:<br><em>d/dx [5x⁴] = 5 &bull; (4x&sup3;) = 20x&sup3;</em>.",
+                accum: "20x&sup3;"
+            },
+            {
+                highlight: 2,
+                title: "Término 2: Derivando -3x²",
+                desc: "<strong>Regla de la Potencia y Factor Constante</strong>:<br>El exponente 2 baja multiplicando a la constante -3, y la potencia de x se reduce:<br><em>d/dx [-3x²] = -3 &bull; (2x) = -6x</em>.",
+                accum: "20x&sup3; - 6x"
+            },
+            {
+                highlight: 3,
+                title: "Término 3: Derivando 7x",
+                desc: "<strong>Regla del Factor Constante e Identidad</strong>:<br>La derivada de x con respecto a x es 1, por lo que multiplicamos por el coeficiente 7:<br><em>d/dx [7x] = 7 &bull; (1) = 7</em>.",
+                accum: "20x&sup3; - 6x + 7"
+            },
+            {
+                highlight: 4,
+                title: "Término 4: Derivando -9",
+                desc: "<strong>Regla de la Constante</strong>:<br>La derivada de cualquier valor numérico constante sin variable es siempre cero:<br><em>d/dx [-9] = 0</em>.",
+                accum: "20x&sup3; - 6x + 7 - 0"
+            },
+            {
+                highlight: 5,
+                title: "Resultado Simplificado",
+                desc: "<strong>Resultado Final Simplificado</strong>:<br>Sumamos los términos algebraicos y omitimos la constante nula del final:<br><strong>f'(x) = 20x&sup3; - 6x + 7</strong>.",
+                accum: "20x&sup3; - 6x + 7"
+            }
+        ];
+
+        function updatePolyStep() {
+            const step = polyTerms[polyStep];
+
+            // Reset styles and apply to active
+            for (let i = 1; i <= 4; i++) {
+                const el = document.getElementById(`p-term-${i}`);
+                if (step.highlight === i) {
+                    el.style.color = "var(--primary-gold)";
+                    el.style.background = "#fffbeb";
+                    el.style.border = "1px solid var(--primary-gold)";
+                    el.style.padding = "1px 6px";
+                    el.style.borderRadius = "4px";
+                } else {
+                    el.style.color = "var(--primary-slate)";
+                    el.style.background = "transparent";
+                    el.style.border = "none";
+                    el.style.padding = "0";
+                    el.style.borderRadius = "0";
+                }
+            }
+
+            document.getElementById('p-step-title').innerHTML = step.title;
+            document.getElementById('p-step-desc').innerHTML = step.desc;
+            document.getElementById('p-deriv-accum').innerHTML = step.accum;
+
+            document.getElementById('btn-p-prev').disabled = (polyStep === 0);
+            document.getElementById('btn-p-prev').style.opacity = (polyStep === 0) ? "0.4" : "1";
+            document.getElementById('btn-p-next').innerText = (polyStep === polyTerms.length - 1) ? "Reiniciar" : "Siguiente";
+        }
+
+        function nextPolyStep() {
+            if (polyStep === polyTerms.length - 1) {
+                polyStep = 0;
+            } else {
+                polyStep++;
+            }
+            updatePolyStep();
+        }
+
+        function prevPolyStep() {
+            if (polyStep > 0) {
+                polyStep--;
+                updatePolyStep();
+            }
+        }
+
+        // Product Rule stepper logic
+        let prodStep = 0;
+        const prodSteps = [
+            {
+                title: "Introducción al Producto",
+                desc: "Vamos a derivar la función producto <em>f</em>(<em>x</em>) = (3<em>x</em><sup>2</sup> + 1)(<em>x</em> - 2). Definimos los factores como <em>u</em> y <em>v</em>.",
+                highlightF: "(3x<sup>2</sup> + 1)(x - 2)",
+                math: "Identificaremos los factores de la función.",
+                accum: "..."
+            },
+            {
+                title: "Paso 1: Identificar u y v",
+                desc: "Definimos los dos factores:<br>&bull; <strong>u</strong> = 3<em>x</em><sup>2</sup> + 1<br>&bull; <strong>v</strong> = <em>x</em> - 2",
+                highlightF: "<span style='color:var(--primary-gold);background:#fffbeb;padding:2px 4px;border-radius:4px;border:1px solid var(--primary-gold);'>(3x<sup>2</sup> + 1)</span><span style='color:var(--primary-teal);background:#f0fdf4;padding:2px 4px;border-radius:4px;border:1px solid var(--primary-teal);'>(x - 2)</span>",
+                math: "<strong>Factores asignados:</strong><br>u = 3x² + 1<br>v = x - 2",
+                accum: "..."
+            },
+            {
+                title: "Paso 2: Derivar u y v",
+                desc: "Calculamos las derivadas individuales de cada término:<br>&bull; <em>u' = (3x² + 1)' = 6x</em><br>&bull; <em>v' = (x - 2)' = 1</em>",
+                highlightF: "(3x<sup>2</sup> + 1)(x - 2)",
+                math: "<strong>Derivadas individuales:</strong><br>u' = (3x² + 1)' = 6x<br>v' = (x - 2)' = 1",
+                accum: "..."
+            },
+            {
+                title: "Paso 3: Ensamblar Fórmula",
+                desc: "Sustituimos en la fórmula de la derivada del producto:<br><strong>(u &bull; v)' = u' &bull; v + u &bull; v'</strong>",
+                highlightF: "(3x<sup>2</sup> + 1)(x - 2)",
+                math: "<strong>Aplicación directa:</strong><br>f'(x) = (u') &bull; (v) + (u) &bull; (v')<br>f'(x) = (6x)(x - 2) + (3x² + 1)(1)",
+                accum: "(6x)(x - 2) + (3x² + 1)(1)"
+            },
+            {
+                title: "Paso 4: Multiplicar Términos",
+                desc: "Desarrollamos los productos algebraicos:<br>&bull; <em>6x(x - 2) = 6x² - 12x</em><br>&bull; <em>(3x² + 1)(1) = 3x² + 1</em>",
+                highlightF: "(3x<sup>2</sup> + 1)(x - 2)",
+                math: "<strong>Expresión expandida:</strong><br>f'(x) = 6x² - 12x + 3x² + 1",
+                accum: "6x² - 12x + 3x² + 1"
+            },
+            {
+                title: "Paso 5: Simplificación Final",
+                desc: "Sumamos los términos de igual grado (6x² + 3x² = 9x²):<br>¡Obtenemos la derivada final simplificada!",
+                highlightF: "(3x<sup>2</sup> + 1)(x - 2)",
+                math: "<strong>Términos semejantes sumados:</strong><br>6x² + 3x² = 9x²",
+                accum: "9x² - 12x + 1"
+            }
+        ];
+
+        function updateProdStep() {
+            const step = prodSteps[prodStep];
+            document.getElementById('prod-step-title').innerHTML = step.title;
+            document.getElementById('prod-step-desc').innerHTML = step.desc;
+            document.getElementById('prod-f-expr').innerHTML = step.highlightF;
+            document.getElementById('prod-math-deriv').innerHTML = step.math;
+            document.getElementById('prod-deriv-accum').innerHTML = step.accum;
+
+            document.getElementById('btn-prod-prev').disabled = (prodStep === 0);
+            document.getElementById('btn-prod-prev').style.opacity = (prodStep === 0) ? "0.4" : "1";
+            document.getElementById('btn-prod-next').innerText = (prodStep === prodSteps.length - 1) ? "Reiniciar" : "Siguiente";
+        }
+
+        function nextProdStep() {
+            if (prodStep === prodSteps.length - 1) prodStep = 0;
+            else prodStep++;
+            updateProdStep();
+        }
+
+        function prevProdStep() {
+            if (prodStep > 0) {
+                prodStep--;
+                updateProdStep();
+            }
+        }
+
+        // Quotient Rule stepper logic
+        let quotStep = 0;
+        const quotSteps = [
+            {
+                title: "Introducción al Cociente",
+                desc: "Vamos a derivar <em>f</em>(<em>x</em>) = (2<em>x</em> - 5)/(3<em>x</em> + 4) usando la Regla del Cociente. Definimos el numerador como <em>u</em> y el denominador como <em>v</em>.",
+                math: "Identificaremos el numerador y el denominador.",
+                accum: "..."
+            },
+            {
+                title: "Paso 1: Identificar u y v",
+                desc: "Asignamos las variables correspondientes:<br>&bull; Numerador <strong>u</strong> = 2<em>x</em> - 5<br>&bull; Denominador <strong>v</strong> = 3<em>x</em> + 4",
+                math: "<strong>Partes identificadas:</strong><br>u = 2x - 5<br>v = 3x + 4",
+                accum: "..."
+            },
+            {
+                title: "Paso 2: Derivar u y v",
+                desc: "Calculamos las derivadas individuales de numerador y denominador:<br>&bull; <em>u' = (2x - 5)' = 2</em><br>&bull; <em>v' = (3x + 4)' = 3</em>",
+                math: "<strong>Derivadas individuales:</strong><br>u' = (2x - 5)' = 2<br>v' = (3x + 4)' = 3",
+                accum: "..."
+            },
+            {
+                title: "Paso 3: Aplicar la Fórmula",
+                desc: "Ensamblamos usando la fórmula del cociente:<br><strong>(u/v)' = (u' &bull; v - u &bull; v') / v²</strong>",
+                math: "<strong>Sustitución en la regla:</strong><br>f'(x) = <span class='math-fraction'><span class='math-numerator'>(2)(3x + 4) - (2x - 5)(3)</span><span class='math-denominator'>(3x + 4)²</span></span>",
+                accum: "<span class='math-fraction'><span class='math-numerator'>2(3x + 4) - (2x - 5)(3)</span><span class='math-denominator'>(3x + 4)²</span></span>"
+            },
+            {
+                title: "Paso 4: Multiplicar Numerador",
+                desc: "Expandimos los productos en el numerador:<br>&bull; <em>2(3x + 4) = 6x + 8</em><br>&bull; <em>(2x - 5)(3) = 6x - 15</em>",
+                math: "<strong>Numerador expandido:</strong><br>f'(x) = <span class='math-fraction'><span class='math-numerator'>(6x + 8) - (6x - 15)</span><span class='math-denominator'>(3x + 4)²</span></span>",
+                accum: "<span class='math-fraction'><span class='math-numerator'>(6x + 8) - (6x - 15)</span><span class='math-denominator'>(3x + 4)²</span></span>"
+            },
+            {
+                title: "Paso 5: Simplificación Final",
+                desc: "Restamos los términos del numerador:<br><em>6x + 8 - 6x + 15 = 23</em>.<br>¡Obtenemos la derivada final simplificada!",
+                math: "<strong>Numerador simplificado:</strong><br>6x - 6x se cancelan.<br>8 + 15 = 23.",
+                accum: "<span class='math-fraction'><span class='math-numerator'>23</span><span class='math-denominator'>(3x + 4)²</span></span>"
+            }
+        ];
+
+        function updateQuotStep() {
+            const step = quotSteps[quotStep];
+            document.getElementById('quot-step-title').innerHTML = step.title;
+            document.getElementById('quot-step-desc').innerHTML = step.desc;
+            document.getElementById('quot-math-deriv').innerHTML = step.math;
+            document.getElementById('quot-deriv-accum').innerHTML = step.accum;
+
+            document.getElementById('btn-quot-prev').disabled = (quotStep === 0);
+            document.getElementById('btn-quot-prev').style.opacity = (quotStep === 0) ? "0.4" : "1";
+            document.getElementById('btn-quot-next').innerText = (quotStep === quotSteps.length - 1) ? "Reiniciar" : "Siguiente";
+        }
+
+        function nextQuotStep() {
+            if (quotStep === quotSteps.length - 1) quotStep = 0;
+            else quotStep++;
+            updateQuotStep();
+        }
+
+        function prevQuotStep() {
+            if (quotStep > 0) {
+                quotStep--;
+                updateQuotStep();
+            }
+        }
+
+        // Chain Rule stepper logic
+        let chainStep = 0;
+        const chainSteps = [
+            {
+                title: "Introducción a la Cadena",
+                desc: "Vamos a derivar la función compuesta <em>f</em>(<em>x</em>) = (4<em>x</em><sup>2</sup> - 3)<sup>5</sup>. Usaremos la regla de la cadena analizando la estructura externa e interna.",
+                highlightF: "(4x<sup>2</sup> - 3)<sup>5</sup>",
+                math: "Analizaremos la composición de funciones.",
+                accum: "..."
+            },
+            {
+                title: "Paso 1: Estructura Interna/Externa",
+                desc: "Definimos la composición:<br>&bull; Externa: <strong>y = u<sup>5</sup></strong><br>&bull; Interna: <strong>u = 4x² - 3</strong>",
+                highlightF: "(<span style='color:var(--primary-teal);background:#f0fdf4;padding:1px 4px;border-radius:4px;border:1px solid var(--primary-teal);'>4x<sup>2</sup> - 3</span>)<sup><span style='color:var(--accent-red);font-weight:bold;'>5</span></sup>",
+                math: "<strong>Composición:</strong><br>y = u⁵ donde u = 4x² - 3",
+                accum: "..."
+            },
+            {
+                title: "Paso 2: Derivada Externa",
+                desc: "Derivamos la función externa respecto a <em>u</em>, manteniendo el bloque interno sin cambios:<br><em>dy/du = (u⁵)' = 5u⁴ = 5(4x² - 3)⁴</em>",
+                highlightF: "5(4x<sup>2</sup> - 3)<sup>4</sup>",
+                math: "<strong>Derivada externa (dy/du):</strong><br>dy/du = 5u⁴<br>&rArr; 5(4x² - 3)⁴",
+                accum: "5(4x² - 3)⁴"
+            },
+            {
+                title: "Paso 3: Derivada Interna",
+                desc: "Derivamos la función interna respecto a <em>x</em>:<br><em>du/dx = (4x² - 3)' = 8x</em>",
+                highlightF: "(4x<sup>2</sup> - 3)<sup>5</sup>",
+                math: "<strong>Derivada interna (du/dx):</strong><br>du/dx = (4x² - 3)' = 8x",
+                accum: "5(4x² - 3)⁴"
+            },
+            {
+                title: "Paso 4: Multiplicar Ambas",
+                desc: "La regla de la cadena establece que multiplicamos ambas derivadas:<br><strong>dy/dx = dy/du &bull; du/dx</strong>",
+                highlightF: "(4x<sup>2</sup> - 3)<sup>5</sup>",
+                math: "<strong>Unión por regla de la cadena:</strong><br>dy/dx = dy/du &bull; du/dx<br>f'(x) = 5(4x² - 3)⁴ &bull; 8x",
+                accum: "5(4x² - 3)⁴ &bull; 8x"
+            },
+            {
+                title: "Paso 5: Simplificación Final",
+                desc: "Multiplicamos los términos libres externos:<br><em>5 &bull; 8x = 40x</em>.<br>¡Obtenemos la derivada final simplificada!",
+                highlightF: "(4x<sup>2</sup> - 3)<sup>5</sup>",
+                math: "<strong>Multiplicación de coeficientes:</strong><br>5 &bull; 8x = 40x",
+                accum: "40x(4x² - 3)⁴"
+            }
+        ];
+
+        function updateChainStep() {
+            const step = chainSteps[chainStep];
+            document.getElementById('chain-step-title').innerHTML = step.title;
+            document.getElementById('chain-step-desc').innerHTML = step.desc;
+            document.getElementById('chain-f-expr').innerHTML = step.highlightF;
+            document.getElementById('chain-math-deriv').innerHTML = step.math;
+            document.getElementById('chain-deriv-accum').innerHTML = step.accum;
+
+            document.getElementById('btn-chain-prev').disabled = (chainStep === 0);
+            document.getElementById('btn-chain-prev').style.opacity = (chainStep === 0) ? "0.4" : "1";
+            document.getElementById('btn-chain-next').innerText = (chainStep === chainSteps.length - 1) ? "Reiniciar" : "Siguiente";
+        }
+
+        function nextChainStep() {
+            if (chainStep === chainSteps.length - 1) chainStep = 0;
+            else chainStep++;
+            updateChainStep();
+        }
+
+        function prevChainStep() {
+            if (chainStep > 0) {
+                chainStep--;
+                updateChainStep();
+            }
+        }
+
+        // Trigonometric Derivatives stepper logic
+        let trigStep = 0;
+        const trigSteps = [
+            {
+                title: "Introducción a Trigonométricas",
+                desc: "Vamos a derivar la función combinada <em>f</em>(<em>x</em>) = 3 sin(<em>x</em>) - 4 cos(<em>x</em>) término a término aplicando las reglas de derivación trigonométricas.",
+                highlightF: "3 sin(x) - 4 cos(x)",
+                math: "Resolveremos término a término.",
+                accum: "..."
+            },
+            {
+                title: "Paso 1: Derivar 3 sin(x)",
+                desc: "La constante 3 se mantiene y aplicamos la derivada de la función seno:<br><strong>(sin x)' = cos x</strong><br>&bull; <em>(3 sin x)' = 3 cos x</em>",
+                highlightF: "<span style='color:var(--primary-gold);background:#fffbeb;padding:2px 4px;border-radius:4px;border:1px solid var(--primary-gold);'>3 sin(x)</span> - 4 cos(x)",
+                math: "<strong>Derivada primer término:</strong><br>(3 sin x)' = 3 cos x",
+                accum: "3 cos(x)"
+            },
+            {
+                title: "Paso 2: Derivar -4 cos(x)",
+                desc: "La constante -4 se mantiene y aplicamos la derivada de la función coseno:<br><strong>(cos x)' = -sin x</strong><br>&bull; <em>(-4 cos x)' = -4(-sin x) = 4 sin x</em>",
+                highlightF: "3 sin(x) <span style='color:var(--primary-teal);background:#f0fdf4;padding:2px 4px;border-radius:4px;border:1px solid var(--primary-teal);'>- 4 cos(x)</span>",
+                math: "<strong>Derivada segundo término:</strong><br>(-4 cos x)' = 4 sin x",
+                accum: "3 cos(x) + 4 sin(x)"
+            },
+            {
+                title: "Paso 3: Expresión Final",
+                desc: "Unimos ambos resultados en una única expresión trigonométrica simplificada.<br>¡Derivación completa!",
+                highlightF: "3 sin(x) - 4 cos(x)",
+                math: "<strong>Resultado simplificado completo:</strong><br>f'(x) = 3 cos(x) + 4 sin(x)",
+                accum: "3 cos(x) + 4 sin(x)"
+            }
+        ];
+
+        function updateTrigStep() {
+            const step = trigSteps[trigStep];
+            document.getElementById('trig-step-title').innerHTML = step.title;
+            document.getElementById('trig-step-desc').innerHTML = step.desc;
+            document.getElementById('trig-f-expr').innerHTML = step.highlightF;
+            document.getElementById('trig-math-deriv').innerHTML = step.math;
+            document.getElementById('trig-deriv-accum').innerHTML = step.accum;
+
+            document.getElementById('btn-trig-prev').disabled = (trigStep === 0);
+            document.getElementById('btn-trig-prev').style.opacity = (trigStep === 0) ? "0.4" : "1";
+            document.getElementById('btn-trig-next').innerText = (trigStep === trigSteps.length - 1) ? "Reiniciar" : "Siguiente";
+        }
+
+        function nextTrigStep() {
+            if (trigStep === trigSteps.length - 1) trigStep = 0;
+            else trigStep++;
+            updateTrigStep();
+        }
+
+        function prevTrigStep() {
+            if (trigStep > 0) {
+                trigStep--;
+                updateTrigStep();
+            }
+        }
+
+        calcDeriv();
+        updatePolyStep();
+        updateProdStep();
+        updateQuotStep();
+        updateChainStep();
+        updateTrigStep();
+        updateGallery();
+    </script>
+</body>
+
+</html>

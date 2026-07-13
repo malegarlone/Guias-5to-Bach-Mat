@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía 20: Definición de Derivada - 5to Bachillerato</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-blue: #1e3a8a;
+            --primary-gold: #b45309;
+            --primary-teal: #0f766e;
+            --primary-slate: #334155;
+            --accent-red: #be123c;
+            --bg-light: #f8fafc;
+            --transition-speed: 0.5s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #cbd5e1;
+            color: #0f172a;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 1024px;
+            height: 600px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: auto;
+        }
+
+        header {
+            background-color: var(--primary-slate);
+            color: white;
+            padding: 0 1.5rem;
+            height: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+            font-weight: 500;
+            z-index: 200;
+            letter-spacing: 0.5px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        #viewport {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        @media (max-height: 650px) or (max-width: 1024px) {
+            #app-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+
+        .slide-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            padding: 20px 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.7rem;
+            color: var(--primary-teal);
+            margin-bottom: 0.8rem;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 1.05rem;
+            color: #334155;
+            max-width: 820px;
+            line-height: 1.5;
+            margin-bottom: 0.6rem;
+        }
+
+        .info-card {
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            background: #f1f5f9;
+            margin: 0.4rem 0;
+            width: 100%;
+            max-width: 780px;
+            text-align: left;
+            border-left: 5px solid var(--primary-blue);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+            line-height: 1.5;
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease;
+            z-index: 250;
+            border: 1px solid #e2e8f0;
+            color: var(--primary-slate);
+            font-size: 1.5rem;
+            user-select: none;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-50%) scale(1.1);
+            background-color: #f8fafc;
+            color: var(--primary-blue);
+            border-color: var(--primary-blue);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #prev-btn {
+            left: 20px;
+        }
+
+        #next-btn {
+            right: 20px;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            padding: 0;
+            bottom: 1.5rem;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: #64748b;
+            z-index: 100;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 6px;
+            background: var(--primary-gold);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 100%;
+            max-width: 650px;
+            margin: 0.5rem auto 0;
+        }
+
+        .option-btn {
+            padding: 0.7rem 1.1rem;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            color: var(--primary-slate);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-blue);
+            background: #f0f9ff;
+        }
+
+        .expl-layout {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+            max-width: 820px;
+            margin-top: 5px;
+            height: 310px;
+        }
+
+        .expl-control {
+            flex: 1.1;
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 12px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            text-align: left;
+            justify-content: center;
+        }
+
+        .expl-visual {
+            flex: 1.1;
+            background: white;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .math-fraction {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            vertical-align: middle;
+            margin: 0 4px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: bold;
+            color: var(--primary-blue);
+            text-align: center;
+            line-height: 1.1;
+            font-size: 1.05rem;
+        }
+
+        .math-numerator {
+            border-bottom: 2px solid currentColor;
+            padding: 0 4px;
+            width: 100%;
+        }
+
+        .math-denominator {
+            padding: 2px 4px 0 4px;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app-container">
+        <header id="global-header">
+            <span>Colegio Escolaris - Matemática 5to Bachillerato</span>
+            <span>Guía 20: Definición de Derivada</span>
+        </header>
+
+        <div id="viewport">
+            <div class="slide-container" id="slide-container">
+
+                <!-- 1. Portada -->
+                <div class="slide active">
+                    <div style="font-size: 4rem; margin-bottom: 15px;">📐📈⚡</div>
+                    <h1>La Definición de Derivada</h1>
+                    <h2>Razón de Cambio y la Recta Tangente</h2>
+                    <p style="color: #64748b; font-style: italic; margin-top: 0.5rem;">Comprende el origen matemático de la derivada utilizando el límite del cociente de diferencias.</p>
+                </div>
+
+                <!-- 2. Objetivos -->
+                <div class="slide">
+                    <h2>¿Qué aprenderemos hoy?</h2>
+                    <div class="info-card" style="border-left-color: var(--primary-blue); background: #f8fafc; max-width: 600px;">
+                        <ul style="list-style-type: none; font-size: 1.1rem; line-height: 1.8; color: var(--primary-slate);">
+                            <li>📐 <strong>Interpretar</strong> la derivada como la pendiente de la recta tangente.</li>
+                            <li>🔄 <strong>Visualizar</strong> cómo la recta secante rota hasta ser tangente cuando el incremento <em>h</em> &rarr; 0.</li>
+                            <li>✍️ <strong>Calcular</strong> derivadas algebraicamente desde la definición formal de límites.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 3. Concepto Secante a Tangente -->
+                <div class="slide">
+                    <h2>De la Recta Secante a la Tangente</h2>
+                    <p>La recta que une dos puntos separados de una curva se llama <strong>secante</strong>, y su pendiente representa la tasa de cambio promedio.</p>
+                    <div class="info-card" style="border-left-color: var(--primary-teal); background: #f0fdf4;">
+                        <p style="font-size: 1rem; color: var(--primary-slate); line-height: 1.6;">
+                            Si acercamos el segundo punto al primero haciendo que la distancia horizontal <em>h</em> tienda a cero (<em>h</em> &rarr; 0):<br>
+                            * La recta secante gira y se convierte en la <strong>recta tangente</strong> (toca a la curva en un solo punto).<br>
+                            * La pendiente de esta recta tangente representa la <strong>razón de cambio instantánea</strong> (la derivada).
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 4. La Fórmula Límite -->
+                <div class="slide">
+                    <h2>La Definición Formal por Límites</h2>
+                    <p>Matemáticamente, la derivada <em>f</em>'(<em>x</em>) es el límite del cociente de incrementos cuando la variación <em>h</em> se aproxima a cero.</p>
+                    <div class="info-card" style="border-left-color: var(--primary-gold); background: #fffcf9; text-align: center;">
+                        <p style="font-size: 1.5rem; font-family: 'Outfit'; font-weight: bold; color: var(--primary-blue); margin: 0;">
+                            f'(x) = lim<sub>h &rarr; 0</sub> <span class="math-fraction"><span class="math-numerator">f(x + h) - f(x)</span><span class="math-denominator">h</span></span>
+                        </p>
+                    </div>
+                    <p style="font-size: 0.95rem; color: #64748b; margin-top: 5px;">Esta expresión se conoce como el <strong>Cociente de Newton</strong>. Resolverla requiere álgebra para eliminar la indeterminación <span class="math-fraction"><span class="math-numerator">0</span><span class="math-denominator">0</span></span>.</p>
+                </div>
+
+                <!-- 5. Ejemplo Resuelto - Paso 1 -->
+                <div class="slide">
+                    <h2>Ejemplo Algebraico: Calcular f'(2) (Paso 1)</h2>
+                    <p>Calculemos la derivada de la función <strong>f(x) = 2x² + 3x</strong> en el punto <strong>x = 2</strong> usando la definición.</p>
+                    <div class="info-card" style="border-left-color: var(--primary-blue); background: #f8fafc; font-size: 0.95rem; line-height: 1.5;">
+                        <strong>Paso A: Evaluar f(2)</strong><br>
+                        f(2) = 2(2)² + 3(2) = 2(4) + 6 = <strong>14</strong><br><br>
+                        <strong>Paso B: Evaluar f(2 + h)</strong><br>
+                        f(2 + h) = 2(2 + h)² + 3(2 + h)<br>
+                        f(2 + h) = 2(4 + 4h + h²) + 6 + 3h<br>
+                        f(2 + h) = 8 + 8h + 2h² + 6 + 3h = <strong>14 + 11h + 2h²</strong>
+                    </div>
+                </div>
+
+                <!-- 6. Ejemplo Resuelto - Paso 2 -->
+                <div class="slide">
+                    <h2>Ejemplo Algebraico: Calcular f'(2) (Paso 2)</h2>
+                    <p>Con los términos evaluados, planteamos la diferencia en el numerador y simplificamos.</p>
+                    <div class="info-card" style="border-left-color: var(--primary-teal); background: #f0fdf5; font-size: 0.95rem; line-height: 1.5;">
+                        <strong>Paso C: Restar f(2 + h) - f(2)</strong><br>
+                        f(2 + h) - f(2) = (14 + 11h + 2h²) - 14 = <strong>11h + 2h²</strong><br><br>
+                        <strong>Paso D: Dividir entre h (Planteamiento del Cociente)</strong><br>
+                        <span class="math-fraction"><span class="math-numerator">f(2 + h) - f(2)</span><span class="math-denominator">h</span></span> = 
+                        <span class="math-fraction"><span class="math-numerator">11h + 2h²</span><span class="math-denominator">h</span></span><br><br>
+                        <strong>Paso E: Factorizar h en el numerador para eliminar la indeterminación</strong><br>
+                        <span class="math-fraction"><span class="math-numerator">h(11 + 2h)</span><span class="math-denominator">h</span></span> = <strong>11 + 2h</strong> (para h &ne; 0)
+                    </div>
+                </div>
+
+                <!-- 7. Ejemplo Resuelto - Paso 3 -->
+                <div class="slide">
+                    <h2>Ejemplo Algebraico: Calcular f'(2) (Paso 3)</h2>
+                    <p>Finalmente, evaluamos el límite del cociente de diferencias cuando el incremento <em>h</em> tiende a cero.</p>
+                    <div class="info-card" style="border-left-color: var(--primary-gold); background: #fffcf0; font-size: 1rem; line-height: 1.6;">
+                        <strong>Paso F: Aplicar el Límite</strong><br>
+                        f'(2) = lim<sub>h &rarr; 0</sub> (11 + 2h)<br>
+                        f'(2) = 11 + 2(0)<br>
+                        <span style="font-size: 1.3rem; font-family: 'Outfit'; font-weight: bold; color: var(--accent-red);">f'(2) = 11</span>
+                    </div>
+                    <p style="font-size: 0.95rem; color: #64748b; margin-top: 5px;">¡Listo! Hemos determinado de forma rigurosa que la pendiente de la recta tangente a la curva en <em>x</em> = 2 es exactamente <strong>11</strong>.</p>
+                </div>
+
+                <!-- 8. Widget Interactivo -->
+                <div class="slide">
+                    <h2 style="margin-bottom: 2px;">Simulador de Pendiente: Secante a Tangente</h2>
+                    <p style="font-size: 0.9rem; margin-bottom: 4px;">Varía el incremento <em>h</em> en la curva <em>f</em>(<em>x</em>) = <span class="math-fraction"><span class="math-numerator">x&sup2;</span><span class="math-denominator">8</span></span> desde el punto base <em>P</em>(3, 1.125) y observa la secante.</p>
+                    
+                    <div class="expl-layout">
+                        <!-- Controls -->
+                        <div class="expl-control">
+                            <div style="display:flex; flex-direction:column; gap:2px;">
+                                <label style="font-weight:bold; font-size:0.8rem; color:var(--primary-blue);" id="lbl-h">Incremento h = 4.0</label>
+                                <input type="range" id="slider-h" min="0.1" max="4.0" step="0.1" value="4.0" style="width:100%;" oninput="updatePlot()">
+                            </div>
+                            
+                            <div style="font-size: 0.8rem; background: #fff; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px 12px; line-height: 1.5; color: var(--primary-slate);">
+                                <strong>Puntos en la Gráfica:</strong><br>
+                                * Punto Base: <strong>P(3.00, 1.13)</strong><br>
+                                * Punto Secante: <span id="lbl-pt-q">Q(7.00, 6.13)</span><br>
+                                <strong>Cálculo de Pendiente (m):</strong><br>
+                                m<sub>sec</sub> = <span class="math-fraction"><span class="math-numerator">y<sub>Q</sub> - y<sub>P</sub></span><span class="math-denominator">x<sub>Q</sub> - x<sub>P</sub></span></span> = 
+                                <span class="math-fraction"><span class="math-numerator"><span id="calc-dy">5.00</span></span><span class="math-denominator"><span id="calc-dx">4.00</span></span></span> = <strong id="lbl-m-sec" style="color:var(--primary-blue);">1.25</strong><br>
+                                Pendiente Tangente Exacta: <strong style="color:var(--accent-red);">m<sub>tan</sub> = 0.75</strong>
+                            </div>
+                        </div>
+
+                        <!-- Plot Visualizer -->
+                        <div class="expl-visual">
+                            <svg width="240" height="180" style="background:#fdfaf6; border-radius:8px; border:1px solid #cbd5e1;">
+                                <!-- Grid Lines -->
+                                <line x1="30" y1="0" x2="30" y2="180" stroke="#cbd5e1" stroke-width="1" /> <!-- Y axis line -->
+                                <line x1="0" y1="150" x2="240" y2="150" stroke="#cbd5e1" stroke-width="1" /> <!-- X axis line -->
+                                
+                                <text x="230" y="162" font-size="10" font-weight="bold" fill="#1e293b">X</text>
+                                <text x="36" y="15" font-size="10" font-weight="bold" fill="#1e293b">Y</text>
+                                
+                                <!-- Numbers -->
+                                <text x="75" y="162" font-size="9" fill="#64748b" text-anchor="middle">3</text>
+                                <text x="135" y="162" font-size="9" fill="#64748b" text-anchor="middle">7</text>
+                                <text x="24" y="90" font-size="9" fill="#64748b" text-anchor="end">4</text>
+                                <text x="24" y="30" font-size="9" fill="#64748b" text-anchor="end">8</text>
+
+                                <!-- Parabola curve path y = x^2 / 8. 
+                                     Mapping: x unit = 15px, y unit = 15px. Origin at (30, 150) -->
+                                <path d="M 30 150 Q 75 141.56 120 105 T 210 15" fill="none" stroke="var(--primary-teal)" stroke-width="2.5" />
+
+                                <!-- Tangent Line at x = 3 (Slope = 0.75) -->
+                                <line x1="0" y1="166.875" x2="165" y2="43.125" stroke="var(--accent-red)" stroke-width="1.5" stroke-dasharray="3,3" />
+
+                                <!-- Dynamic Secant Line -->
+                                <line id="secant-line" x1="75" y1="133.125" x2="135" y2="90" stroke="var(--primary-blue)" stroke-width="2" />
+
+                                <!-- Fixed Base Point P(3, 1.125) -->
+                                <circle cx="75" cy="133.125" r="4.5" fill="var(--primary-slate)" />
+                                <!-- Dynamic Point Q(3+h, f(3+h)) -->
+                                <circle id="svg-q-pt" cx="135" cy="90" r="4.5" fill="var(--primary-gold)" />
+                            </svg>
+                            
+                            <div id="status-limits" style="font-size:0.85rem; font-weight:bold; color:var(--primary-gold);">
+                                h &rarr; 0 | m_sec &rarr; 0.75
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 9. Quiz 1 -->
+                <div class="slide">
+                    <h2>Evaluación Teórica 1</h2>
+                    <p style="margin-bottom: 10px;">Físicamente, si una función representa la posición de un objeto en el tiempo, ¿qué representa el límite del cociente de diferencias o derivada de dicha función?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'Incorrecto. La velocidad promedio se calcula con la recta secante normal sin tomar ningún límite cuando h tiende a cero.')">A) La velocidad promedio del objeto en un intervalo de tiempo largo.</button>
+                        <button class="option-btn" onclick="checkQuiz(1, true, this, '¡Correcto! La derivada representa la tasa de cambio instantánea. Para una función de posición, su derivada en un punto es la velocidad instantánea del objeto.', '')">B) La velocidad instantánea del objeto en un instante exacto.</button>
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'Incorrecto. La aceleración es la tasa de cambio de la velocidad, que corresponde a la segunda derivada, no a la primera derivada de la posición.')">C) La aceleración promedio del objeto.</button>
+                    </div>
+                    <div id="feedback-1" style="margin-top: 0.8rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 10. Quiz 2 -->
+                <div class="slide">
+                    <h2>Evaluación Teórica 2</h2>
+                    <p style="margin-bottom: 10px;">Al calcular una derivada por la definición, ¿por qué es necesario realizar factorizaciones algebraicas en el numerador antes de evaluar el límite cuando <em>h</em> tiende a 0?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'Incorrecto. La variable h es indispensable en la definición y no se puede eliminar sin realizar el procedimiento formal.')">A) Para eliminar por completo la variable h y evitar cálculos complejos.</button>
+                        <button class="option-btn" onclick="checkQuiz(2, true, this, '¡Excelente! Al sustituir h=0 directamente en el cociente inicial, obtenemos 0/0, lo cual es una indeterminación. Factorizar y simplificar h elimina esta indeterminación.', '')">B) Para simplificar la indeterminación de tipo 0/0 que se produce al dividir entre h.</button>
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'Incorrecto. El límite no depende de si el resultado es una constante o una función.')">C) Para asegurar que la pendiente resultante siempre sea una constante entera.</button>
+                    </div>
+                    <div id="feedback-2" style="margin-top: 0.8rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 11. Quiz 3 -->
+                <div class="slide">
+                    <h2>Evaluación Teórica 3</h2>
+                    <p style="margin-bottom: 10px;">¿Qué línea de la gráfica representa la tasa de cambio promedio y cuál la tasa de cambio instantánea?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'Incorrecto. La recta secante corta en dos puntos (tasa promedio) y la recta tangente en un solo punto (tasa instantánea).')">A) La recta tangente representa la tasa promedio y la recta secante la instantánea.</button>
+                        <button class="option-btn" onclick="checkQuiz(3, true, this, '¡Excelente! La recta secante pasa por dos puntos y mide el promedio en el intervalo; al reducir dicho intervalo a cero, se convierte en la tangente, midiendo el cambio instantáneo.', '')">B) La recta secante representa la tasa promedio y la recta tangente la instantánea.</button>
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'Incorrecto. Ambas rectas tienen pendientes que corresponden a razones de cambio.')">C) Ambas rectas representan la tasa de cambio instantánea.</button>
+                    </div>
+                    <div id="feedback-3" style="margin-top: 0.8rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 12. Final -->
+                <div class="slide">
+                    <div style="font-size: 4.5rem;">🎯</div>
+                    <h2>¡Misión Cumplida!</h2>
+                    <p>¡Has dominado el cálculo y la interpretación geométrica de la derivada mediante límites!</p>
+                    <button onclick="goToSlide(0)"
+                        style="background: var(--primary-gold); color: white; border: none; padding: 0.8rem 1.8rem; border-radius: 30px; font-weight: 700; cursor: pointer; margin-top: 1rem; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Volver al inicio</button>
+                </div>
+
+            </div>
+        </div>
+
+        <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled aria-label="Anterior">&#8592;</button>
+        <button class="nav-btn" id="next-btn" onclick="nextSlide()" aria-label="Siguiente">&#8594;</button>
+
+        <div class="slide-indicators">
+            <span id="slide-num">1 / 12</span>
+        </div>
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const container = document.getElementById('slide-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const slideNum = document.getElementById('slide-num');
+        const progressBar = document.getElementById('progress-bar');
+
+        function updateGallery() {
+            container.style.transform = `translateX(-${currentSlide * 100}%)`;
+            slides.forEach((slide, index) => slide.classList.toggle('active', index === currentSlide));
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === slides.length - 1;
+            slideNum.innerText = `${currentSlide + 1} / ${slides.length}`;
+            progressBar.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
+        }
+
+        function nextSlide() { if (currentSlide < slides.length - 1) { currentSlide++; updateGallery(); } }
+        function prevSlide() { if (currentSlide > 0) { currentSlide--; updateGallery(); } }
+        function goToSlide(n) { currentSlide = n; updateGallery(); }
+
+        document.addEventListener('keydown', e => { 
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide(); 
+            if (e.key === 'ArrowLeft') prevSlide(); 
+        });
+
+        // Widget logic
+        function updatePlot() {
+            const h = parseFloat(document.getElementById('slider-h').value);
+            document.getElementById('lbl-h').innerText = `Incremento h = ${h.toFixed(1)}`;
+
+            // P(3, 1.125)
+            const px = 3.0;
+            const py = 1.125;
+
+            // Q(3+h, f(3+h))
+            const qx = px + h;
+            const qy = (qx * qx) / 8;
+
+            const dy = qy - py;
+            const dx = qx - px;
+            const mSec = dy / dx;
+
+            document.getElementById('lbl-pt-q').innerText = `Q(${qx.toFixed(2)}, ${qy.toFixed(2)})`;
+            document.getElementById('calc-dy').innerText = dy.toFixed(2);
+            document.getElementById('calc-dx').innerText = dx.toFixed(2);
+            document.getElementById('lbl-m-sec').innerText = mSec.toFixed(2);
+
+            // Map to SVG coordinates:
+            // x unit = 15px, y unit = 15px. Origin at (30, 150)
+            const svgPx = 30 + px * 15;
+            const svgPy = 150 - py * 15;
+
+            const svgQx = 30 + qx * 15;
+            const svgQy = 150 - qy * 15;
+
+            // Update Point Q
+            const qPt = document.getElementById('svg-q-pt');
+            qPt.setAttribute('cx', svgQx);
+            qPt.setAttribute('cy', svgQy);
+
+            // Update Secant Line
+            const secLine = document.getElementById('secant-line');
+            // Extend the line slightly for visual appeal
+            const extX1 = svgPx - 40;
+            const extY1 = svgPy + (40 / 15) * mSec * 15;
+            const extX2 = svgQx + 40;
+            const extY2 = svgQy - (40 / 15) * mSec * 15;
+
+            secLine.setAttribute('x1', extX1);
+            secLine.setAttribute('y1', extY1);
+            secLine.setAttribute('x2', extX2);
+            secLine.setAttribute('y2', extY2);
+        }
+
+        // Quiz Logic
+        function checkQuiz(qId, isCorrect, btn, correctMsg, incorrectMsg) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const containerOpts = btn.parentElement;
+
+            if (isCorrect) {
+                containerOpts.querySelectorAll('.option-btn').forEach(b => {
+                    b.disabled = true;
+                    b.style.opacity = "0.5";
+                });
+                btn.disabled = false;
+                btn.style.opacity = "1";
+                btn.style.background = "#dcfce7";
+                btn.style.borderColor = "#10b981";
+                btn.style.color = "#065f46";
+                feedback.innerHTML = `✅ ¡Correcto! ${correctMsg}`;
+                feedback.style.color = "#10b981";
+            } else {
+                btn.style.background = "#fee2e2";
+                btn.style.borderColor = "#dc2626";
+                btn.style.color = "#9f1239";
+                btn.disabled = true;
+                feedback.innerHTML = `❌ <span>${incorrectMsg}</span> <button onclick="resetQuiz(${qId})" style="margin-left:10px; background:var(--primary-slate); color:white; border:none; padding:4px 10px; border-radius:6px; cursor:pointer; font-size:0.8rem;">Reintentar</button>`;
+                feedback.style.color = "#dc2626";
+            }
+        }
+
+        function resetQuiz(qId) {
+            const feedback = document.getElementById(`feedback-${qId}`);
+            const containerOpts = feedback.parentElement.querySelector('.quiz-container');
+            containerOpts.querySelectorAll('.option-btn').forEach(b => {
+                b.disabled = false;
+                b.style.opacity = "1";
+                b.style.background = "white";
+                b.style.borderColor = "#cbd5e1";
+                b.style.color = "var(--primary-slate)";
+            });
+            feedback.innerHTML = "";
+        }
+
+        updatePlot();
+        updateGallery();
+    </script>
+</body>
+
+</html>
