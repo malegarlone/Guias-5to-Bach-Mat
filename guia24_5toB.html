@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía 24: Integración Trigonométrica y Sustitución - 5to Bachillerato</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700&display=swap"
+        rel="stylesheet">
+    
+    <!-- MathJax Library para Renderizado Matemático LaTeX Formal -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary-orange: #db6015;
+            --primary-yellow: #f7be00;
+            --primary-blue-dark: #244b5a;
+            --primary-green: #22c55e;
+            --primary-red: #ef4444;
+            --primary-purple: #8b5cf6;
+            --bg-light: #f8fafc;
+            --transition-speed: 0.5s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e2e8f0;
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 960px;
+            height: 540px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: auto;
+        }
+
+        header {
+            background-color: var(--primary-blue-dark);
+            color: white;
+            padding: 0 1.5rem;
+            height: 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            z-index: 200;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        #viewport {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        @media (max-height: 600px) or (max-width: 960px) {
+            #app-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+
+        .slide-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            padding: 20px 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            color: var(--primary-orange);
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6rem;
+            color: var(--primary-blue-dark);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            color: var(--primary-blue-dark);
+            margin-bottom: 0.3rem;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 0.95rem;
+            color: #444;
+            max-width: 780px;
+            line-height: 1.6;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-card {
+            padding: 0.8rem 1.2rem;
+            border-radius: 12px;
+            background: #f0f8ff;
+            margin: 0.5rem 0;
+            width: 100%;
+            max-width: 780px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            z-index: 250;
+            border: 1px solid #ddd;
+            color: var(--primary-blue-dark);
+            font-size: 1.3rem;
+            user-select: none;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            color: var(--primary-orange);
+            border-color: var(--primary-orange);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #prev-btn {
+            left: 15px;
+        }
+
+        #next-btn {
+            right: 15px;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            font-size: 0.85rem;
+            color: #888;
+            z-index: 100;
+        }
+
+        .progress-bar-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: #edf2f7;
+            z-index: 100;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--primary-orange);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 100%;
+            max-width: 600px;
+            margin: 0.5rem auto;
+        }
+
+        .option-btn {
+            padding: 0.75rem 1.1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.92rem;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-orange);
+            background: #fffcf9;
+        }
+
+        .columns-container {
+            display: flex;
+            gap: 15px;
+            margin: 8px 0;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .column-card {
+            flex: 1;
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 10px 14px;
+            text-align: center;
+        }
+
+        .column-card-title {
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--primary-blue-dark);
+            border-bottom: 2px dashed #cbd5e1;
+            padding-bottom: 4px;
+            margin-bottom: 6px;
+        }
+
+        /* Estilos Libro de Texto: Pirámide Inversa a la Izquierda, Explicación a la Derecha */
+        .textbook-table {
+            width: 100%;
+            max-width: 780px;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 8px auto;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #ffffff;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+        }
+
+        .textbook-table th {
+            background-color: var(--primary-blue-dark);
+            color: #ffffff;
+            padding: 8px 12px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .textbook-table td {
+            padding: 8px 12px;
+            border-bottom: 1px dashed #cbd5e1;
+            vertical-align: middle;
+            line-height: 1.5;
+        }
+
+        .textbook-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .pyramid-col {
+            width: 48%;
+            text-align: center;
+            background: #fafafa;
+            border-right: 2px solid #cbd5e1;
+            font-family: 'Outfit', monospace;
+        }
+
+        .explain-col {
+            width: 52%;
+            text-align: left;
+            font-size: 0.88rem;
+            color: #334155;
+        }
+
+        .widget-box {
+            background: #f1f5f9;
+            border: 2px solid #cbd5e1;
+            border-radius: 16px;
+            padding: 12px 20px;
+            width: 100%;
+            max-width: 650px;
+            margin-top: 5px;
+        }
+
+        .widget-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 6px 0;
+        }
+
+        .widget-label {
+            font-weight: bold;
+            color: var(--primary-blue-dark);
+            font-size: 0.95rem;
+        }
+
+        .widget-slider {
+            flex: 1;
+            margin: 0 15px;
+            accent-color: var(--primary-green);
+        }
+
+        .widget-val {
+            font-size: 1.15rem;
+            font-weight: bold;
+            color: var(--primary-green);
+            width: 80px;
+            text-align: right;
+        }
+
+        .conversion-grid {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            justify-content: space-around;
+        }
+
+        .conversion-box {
+            background: white;
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            flex: 1;
+            text-align: center;
+        }
+
+        .conversion-val {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--primary-blue-dark);
+        }
+
+        .conversion-lbl {
+            font-size: 0.78rem;
+            color: #64748b;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app-container">
+        <header id="global-header">
+            <span>Colegio Escolaris - Matemática 5to Bachillerato</span>
+            <span>Guía 24: Integración Trigonométrica y Sustitución</span>
+        </header>
+
+        <div id="viewport">
+            <div class="slide-container" id="slide-container">
+                
+                <!-- 1. Portada -->
+                <div class="slide active">
+                    <div style="font-size: 75px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));">∫&thinsp;sin(u)&thinsp;du 🌊📐</div>
+                    <h1>Integración Trigonométrica y Sustitución</h1>
+                    <h2>Lección 24 &bull; 5&deg; Bachillerato</h2>
+                    <p style="color: #64748b; font-style: italic;">¡Método de cambio de variable (Sustitución u) y fórmulas fundamentales para integrales trigonométricas!</p>
+                </div>
+
+                <!-- 2. Vocabulario Fundamental de Sustitución -->
+                <div class="slide">
+                    <h2>Vocabulario Previo: Cambio de Variable</h2>
+                    <p>La regla de sustitución es el análogo a la regla de la cadena en derivación:</p>
+
+                    <div style="display: flex; gap: 12px; width: 100%; max-width: 780px; margin-top: 10px;">
+                        <div class="column-card" style="border-color: #0284c7; text-align: left; padding: 10px 14px;">
+                            <h3 style="color: #0284c7; font-size: 1rem; border-bottom: 1px dashed #cbd5e1; padding-bottom: 4px; margin-bottom: 6px;">🔄 Variable Auxiliar u</h3>
+                            <p style="font-size: 0.86rem; color: #334155; line-height: 1.5;">Elección estratégica de $u = g(x)$ tal que su diferencial $du = g'(x)\,dx$ esté presente en la integral.</p>
+                        </div>
+                        <div class="column-card" style="border-color: var(--primary-orange); text-align: left; padding: 10px 14px;">
+                            <h3 style="color: var(--primary-orange); font-size: 1rem; border-bottom: 1px dashed #cbd5e1; padding-bottom: 4px; margin-bottom: 6px;">⚡ Diferencial du</h3>
+                            <p style="font-size: 0.86rem; color: #334155; line-height: 1.5;">Expresión $du = g'(x)\,dx$ que permite transformar la integral de la variable $x$ a una integral elemental de $u$.</p>
+                        </div>
+                        <div class="column-card" style="border-color: var(--primary-purple); text-align: left; padding: 10px 14px;">
+                            <h3 style="color: var(--primary-purple); font-size: 1rem; border-bottom: 1px dashed #cbd5e1; padding-bottom: 4px; margin-bottom: 6px;">🌊 Ciclo Trigonométrico</h3>
+                            <p style="font-size: 0.86rem; color: #334155; line-height: 1.5;">Propiedad periódica de las integrales de $\sin(x)$ y $\cos(x)$ donde se invierten los signos algebraicos.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Formulario Trigonométrico Básico -->
+                <div class="slide">
+                    <h2>Integrales Trigonométricas Elementales</h2>
+                    <p>Identidades de integración inmediata de funciones trigonométricas directas:</p>
+
+                    <div class="columns-container" style="gap: 15px;">
+                        <div class="column-card" style="border-color: var(--primary-green); padding: 12px;">
+                            <div class="column-card-title" style="color: var(--primary-green); font-size: 1.05rem;">Seno y Coseno</div>
+                            <p style="font-size: 1.15rem; font-weight: bold; color: var(--primary-blue-dark); margin: 6px 0;">
+                                $$\int \sin(x)\,dx = -\cos(x) + C$$
+                                $$\int \cos(x)\,dx = \sin(x) + C$$
+                            </p>
+                        </div>
+                        <div class="column-card" style="border-color: var(--primary-purple); padding: 12px;">
+                            <div class="column-card-title" style="color: var(--primary-purple); font-size: 1.05rem;">Secante Cuadrada</div>
+                            <p style="font-size: 1.15rem; font-weight: bold; color: var(--primary-blue-dark); margin: 6px 0;">
+                                $$\int \sec^2(x)\,dx = \tan(x) + C$$
+                                $$\int \csc^2(x)\,dx = -\cot(x) + C$$
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Ejemplo 1: Sustitución Algebraica (Libro de Texto) -->
+                <div class="slide">
+                    <h2>Ejemplo 1: Integración por Sustitución $u$</h2>
+                    <p style="margin-bottom: 4px;">Calcular la integral indefinida $\int 2x(x^2 + 5)^4 \,dx$.</p>
+
+                    <table class="textbook-table">
+                        <thead>
+                            <tr>
+                                <th class="pyramid-col">Desarrollo Matemático (Pirámide Inversa)</th>
+                                <th class="explain-col">Justificación y Explicación del Nivel</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="pyramid-col">$u = x^2 + 5 \implies du = 2x\,dx$</td>
+                                <td class="explain-col"><strong>Nivel 1: Selección de Sustitución.</strong> Elegimos $u$ como el término entre paréntesis y derivamos.</td>
+                            </tr>
+                            <tr>
+                                <td class="pyramid-col">$\int (x^2 + 5)^4 \cdot (2x\,dx) = \int u^4 \,du$</td>
+                                <td class="explain-col"><strong>Nivel 2: Cambio de Variable Completo.</strong> Transformamos la integral a la variable simple $u$.</td>
+                            </tr>
+                            <tr>
+                                <td class="pyramid-col">$= \frac{u^{4+1}}{4+1} + C = \frac{u^5}{5} + C$</td>
+                                <td class="explain-col"><strong>Nivel 3: Integración Inmediata de Potencia.</strong> Aplicamos la regla de la potencia en $u$.</td>
+                            </tr>
+                            <tr>
+                                <td class="pyramid-col" style="color: var(--primary-green); font-weight: bold;">$= \frac{(x^2 + 5)^5}{5} + C$</td>
+                                <td class="explain-col"><strong>Nivel 4: Restitución de Variable Original.</strong> Reemplazamos $u = x^2 + 5$ para la solución final.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 5. Ejemplo 2: Integración Trigonométrica con Sustitución (Libro de Texto) -->
+                <div class="slide">
+                    <h2>Ejemplo 2: Integral Trigonométrica Compuesta</h2>
+                    <p style="margin-bottom: 4px;">Calcular la integral indefinida $\int \cos(3x)\,dx$.</p>
+
+                    <table class="textbook-table">
+                        <thead>
+                            <tr>
+                                <th class="pyramid-col">Desarrollo Matemático (Pirámide Inversa)</th>
+                                <th class="explain-col">Justificación y Explicación del Nivel</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="pyramid-col">$u = 3x \implies du = 3\,dx \implies dx = \frac{du}{3}$</td>
+                                <td class="explain-col"><strong>Nivel 1: Cambio de Argumento.</strong> Elegimos $u = 3x$ y despejamos $dx = \frac{du}{3}$.</td>
+                            </tr>
+                            <tr>
+                                <td class="pyramid-col">$\int \cos(u) \cdot \frac{du}{3} = \frac{1}{3} \int \cos(u)\,du$</td>
+                                <td class="explain-col"><strong>Nivel 2: Extracción de Constante.</strong> Extraemos el factor $\frac{1}{3}$ fuera del símbolo integral.</td>
+                            </tr>
+                            <tr>
+                                <td class="pyramid-col">$= \frac{1}{3} \sin(u) + C$</td>
+                                <td class="explain-col"><strong>Nivel 3: Integración de Coseno.</strong> Usamos la regla inmediata $\int \cos(u)du = \sin(u)$.</td>
+                            </tr>
+                            <tr>
+                                <td class="pyramid-col" style="color: var(--primary-orange); font-weight: bold;">$= \frac{1}{3} \sin(3x) + C$</td>
+                                <td class="explain-col"><strong>Nivel 4: Restitución Final.</strong> Reemplazamos $u = 3x$ en el resultado final.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 6. Ejemplo 3: Sustitución Trigonométrica con Potencia (Libro de Texto) -->
+                <div class="slide">
+                    <h2>Ejemplo 3: Potencia de Funciones Trigonométricas</h2>
+                    <p style="margin-bottom: 4px;">Calcular la integral indefinida $\int \sin^3(x) \cos(x) \,dx$.</p>
+
+                    <table class="textbook-table">
+                        <thead>
+                            <tr>
+                                <th class="pyramid-col">Desarrollo Matemático (Pirámide Inversa)</th>
+                                <th class="explain-col">Justificación y Explicación del Nivel</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="pyramid-col">$u = \sin(x) \implies du = \cos(x)\,dx$</td>
+                                <td class="explain-col"><strong>Nivel 1: Elección de la Base.</strong> Elegimos $u = \sin(x)$ pues su derivada $\cos(x)$ está presente.</td>
+                            </tr>
+                            <tr>
+                                <td class="pyramid-col">$\int [\sin(x)]^3 \cdot \cos(x)\,dx = \int u^3 \,du$</td>
+                                <td class="explain-col"><strong>Nivel 2: Sustitución Algebraica.</strong> Reemplazamos obteniendo una simple potencia $u^3$.</td>
+                            </tr>
+                            <tr>
+                                <td class="pyramid-col">$= \frac{u^4}{4} + C$</td>
+                                <td class="explain-col"><strong>Nivel 3: Regla de la Potencia.</strong> Integramos $u^3$ resultando $\frac{u^4}{4} + C$.</td>
+                            </tr>
+                            <tr>
+                                <td class="pyramid-col" style="color: var(--primary-purple); font-weight: bold;">$= \frac{\sin^4(x)}{4} + C$</td>
+                                <td class="explain-col"><strong>Nivel 4: Restitución de la Variable.</strong> Reemplazamos $u = \sin(x)$ obteniendo $\frac{\sin^4(x)}{4} + C$.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 7. Simulador Interactivo de Función Seno y Coseno -->
+                <div class="slide">
+                    <h2>¡Simulador Interactivo de Onda Senoidal y Cosenoidal!</h2>
+                    <p>Mueve el ángulo $\theta$ en radianes para observar la evaluación de $\sin(\theta)$ e la integral $-\cos(\theta)$:</p>
+                    
+                    <div class="widget-box">
+                        <div class="widget-row">
+                            <span class="widget-label">Ángulo en Radianes (&theta;):</span>
+                            <input type="range" min="0" max="6.28" value="1.57" step="0.1" class="widget-slider" id="trig-slider" oninput="simularTrig(this.value)">
+                            <span class="widget-val" id="val-rad">1.57 rad</span>
+                        </div>
+                        
+                        <div class="conversion-grid">
+                            <div class="conversion-box">
+                                <span class="conversion-val" id="res-sin" style="color: var(--primary-green);">sin(1.57) = 1.00</span>
+                                <span class="conversion-lbl">Función $f(\theta) = \sin(\theta)$</span>
+                            </div>
+                            <div class="conversion-box">
+                                <span class="conversion-val" id="res-cos" style="color: var(--primary-purple);">-cos(1.57) = 0.00</span>
+                                <span class="conversion-lbl">Integral $\int \sin(\theta)d\theta = -\cos(\theta)$</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 8. QUIZ 1 -->
+                <div class="slide">
+                    <h2>Reto 1: Integral Inmediata de Seno</h2>
+                    <p>De acuerdo con las reglas de integración trigonométricas fundamentales...</p>
+                    <p style="font-weight: bold; color: var(--primary-blue-dark);">¿A qué es igual la integral indefinida $\int \sin(x) \,dx$?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(1, true, this, '¡Correcto! La integral de sin(x) es -cos(x) + C.', '')">A) $-\cos(x) + C$</button>
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'cos(x) es la derivada de sin(x), no su integral. La integral lleva signo negativo.')">B) $\cos(x) + C$</button>
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', '-sin(x) no corresponde a la antiderivada de sin(x).')">C) $-\sin(x) + C$</button>
+                    </div>
+                    <div id="feedback-1" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 9. QUIZ 2 -->
+                <div class="slide">
+                    <h2>Reto 2: Selección de Sustitución u</h2>
+                    <p>En la integral $\int 3x^2 \cos(x^3) \,dx$, ¿cuál es la mejor elección para la variable $u$?</p>
+                    <p style="font-weight: bold; color: var(--primary-blue-dark);">¿Qué expresión elegimos como $u$?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(2, true, this, '¡Excelente! Escribimos u = x³ porque su derivada du = 3x² dx aparece multiplicando.', '')">A) $u = x^3$ (con $du = 3x^2 \,dx$)</button>
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'Elegir u = cos(x³) complica la expresión al derivar por regla de la cadena.')">B) $u = \cos(x^3)$</button>
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'u = 3x² no elimina el argumento compuesto x³.')">C) $u = 3x^2$</button>
+                    </div>
+                    <div id="feedback-2" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 10. QUIZ 3 -->
+                <div class="slide">
+                    <h2>Reto 3: Integral Compuesta por Sustitución</h2>
+                    <p>Calcula la integral $\int e^{2x} \,dx$ usando la sustitución $u = 2x$.</p>
+                    <p style="font-weight: bold; color: var(--primary-blue-dark);">¿Cuál es el resultado de la integral?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(3, true, this, '¡Perfecto! Al despejar dx = du/2, obtenemos (1/2) e^(2x) + C.', '')">A) $\frac{1}{2} e^{2x} + C$</button>
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'Multiplicar por 2 es el resultado de la derivada, no de la integral.')">B) $2 e^{2x} + C$</button>
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'El exponente 2x exige dividir entre 2 por el cambio de variable.')">C) $e^{2x} + C$</button>
+                    </div>
+                    <div id="feedback-3" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 11. Final -->
+                <div class="slide">
+                    <div style="font-size: 80px;">🎯</div>
+                    <h2>¡Misión Cumplida!</h2>
+                    <p>¡Has completado exitosamente todo el programa de Cálculo para 5to de Bachillerato!</p>
+                    <button onclick="goToSlide(0)"
+                        style="background: var(--primary-orange); color: white; border: none; padding: 1rem 2rem; border-radius: 30px; font-weight: 700; cursor: pointer; margin-top: 1.5rem; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Volver a estudiar</button>
+                </div>
+
+            </div>
+        </div>
+
+        <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled aria-label="Anterior">&#8592;</button>
+        <button class="nav-btn" id="next-btn" onclick="nextSlide()" aria-label="Siguiente">&#8594;</button>
+
+        <div class="slide-indicators">
+            <span id="slide-num">1 / 11</span>
+        </div>
+
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const totalSlides = 11;
+        const slideContainer = document.getElementById('slide-container');
+        const slideNumDisplay = document.getElementById('slide-num');
+        const progressBar = document.getElementById('progress-bar');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+
+        function updateSlide() {
+            slideContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
+            slideNumDisplay.textContent = `${currentSlide + 1} / ${totalSlides}`;
+            
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            progressBar.style.width = `${progress}%`;
+
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === totalSlides - 1;
+
+            const slides = document.querySelectorAll('.slide');
+            slides.forEach((slide, index) => {
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        function goToSlide(num) {
+            currentSlide = num;
+            updateSlide();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        function simularTrig(val) {
+            const rad = parseFloat(val);
+            document.getElementById('val-rad').textContent = `${rad.toFixed(2)} rad`;
+            const sinVal = Math.sin(rad).toFixed(2);
+            const cosVal = (-Math.cos(rad)).toFixed(2);
+            
+            document.getElementById('res-sin').textContent = `sin(${rad.toFixed(2)}) = ${sinVal}`;
+            document.getElementById('res-cos').textContent = `-cos(${rad.toFixed(2)}) = ${cosVal}`;
+        }
+
+        function checkQuiz(quizNum, isCorrect, btnElement, correctMsg, wrongMsg) {
+            const container = btnElement.parentElement;
+            const buttons = container.querySelectorAll('.option-btn');
+            const feedback = document.getElementById(`feedback-${quizNum}`);
+
+            buttons.forEach(btn => {
+                btn.style.borderColor = '#e2e8f0';
+                btn.style.background = 'white';
+                btn.style.color = '#1e293b';
+            });
+
+            if (isCorrect) {
+                btnElement.style.borderColor = 'var(--primary-green)';
+                btnElement.style.background = '#f0fdf4';
+                btnElement.style.color = '#166534';
+                feedback.style.color = 'var(--primary-green)';
+                feedback.textContent = correctMsg;
+            } else {
+                btnElement.style.borderColor = 'var(--primary-red)';
+                btnElement.style.background = '#fef2f2';
+                btnElement.style.color = '#991b1b';
+                feedback.style.color = '#991b1b';
+                feedback.textContent = wrongMsg;
+            }
+        }
+
+        // Initialize progress bar and slider state
+        updateSlide();
+    </script>
+</body>
+
+</html>

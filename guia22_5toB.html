@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía 22: Aplicación de Derivadas - 5to Bachillerato</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700&display=swap"
+        rel="stylesheet">
+    
+    <!-- MathJax Library para Renderizado Matemático LaTeX Formal -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary-orange: #db6015;
+            --primary-yellow: #f7be00;
+            --primary-blue-dark: #244b5a;
+            --primary-green: #22c55e;
+            --primary-red: #ef4444;
+            --primary-purple: #8b5cf6;
+            --bg-light: #f8fafc;
+            --transition-speed: 0.5s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e2e8f0;
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 960px;
+            height: 540px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: auto;
+        }
+
+        header {
+            background-color: var(--primary-blue-dark);
+            color: white;
+            padding: 0 1.5rem;
+            height: 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            z-index: 200;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        #viewport {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        @media (max-height: 600px) or (max-width: 960px) {
+            #app-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+        }
+
+        .slide-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            padding: 20px 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+            overflow-y: auto;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            color: var(--primary-orange);
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6rem;
+            color: var(--primary-blue-dark);
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            color: var(--primary-blue-dark);
+            margin-bottom: 0.3rem;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 0.95rem;
+            color: #444;
+            max-width: 780px;
+            line-height: 1.6;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-card {
+            padding: 0.8rem 1.2rem;
+            border-radius: 12px;
+            background: #f0f8ff;
+            margin: 0.5rem 0;
+            width: 100%;
+            max-width: 780px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            z-index: 250;
+            border: 1px solid #ddd;
+            color: var(--primary-blue-dark);
+            font-size: 1.3rem;
+            user-select: none;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            color: var(--primary-orange);
+            border-color: var(--primary-orange);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #prev-btn {
+            left: 15px;
+        }
+
+        #next-btn {
+            right: 15px;
+        }
+
+        .slide-indicators {
+            position: absolute;
+            bottom: 1.5rem;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            font-size: 0.85rem;
+            color: #888;
+            z-index: 100;
+        }
+
+        .progress-bar-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: #edf2f7;
+            z-index: 100;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--primary-orange);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            width: 100%;
+            max-width: 600px;
+            margin: 0.5rem auto;
+        }
+
+        .option-btn {
+            padding: 0.75rem 1.1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.92rem;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-orange);
+            background: #fffcf9;
+        }
+
+        .columns-container {
+            display: flex;
+            gap: 15px;
+            margin: 8px 0;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .column-card {
+            flex: 1;
+            background: #f8fafc;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 10px 14px;
+            text-align: center;
+        }
+
+        .column-card-title {
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--primary-blue-dark);
+            border-bottom: 2px dashed #cbd5e1;
+            padding-bottom: 4px;
+            margin-bottom: 6px;
+        }
+
+        /* Estilos Libro de Texto: Pirámide Inversa a la Izquierda, Explicación a la Derecha */
+        .textbook-table {
+            width: 100%;
+            max-width: 780px;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin: 8px auto;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #ffffff;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+        }
+
+        .textbook-table th {
+            background-color: var(--primary-blue-dark);
+            color: #ffffff;
+            padding: 8px 12px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .textbook-table td {
+            padding: 8px 12px;
+            border-bottom: 1px dashed #cbd5e1;
+            vertical-align: middle;
+            line-height: 1.5;
+        }
+
+        .textbook-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .pyramid-col {
+            width: 48%;
+            text-align: center;
+            background: #fafafa;
+            border-right: 2px solid #cbd5e1;
+            font-family: 'Outfit', monospace;
+        }
+
+        .explain-col {
+            width: 52%;
+            text-align: left;
+            font-size: 0.88rem;
+            color: #334155;
+        }
+
+        .widget-box {
+            background: #f1f5f9;
+            border: 2px solid #cbd5e1;
+            border-radius: 16px;
+            padding: 12px 20px;
+            width: 100%;
+            max-width: 650px;
+            margin-top: 5px;
+        }
+
+        .widget-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 6px 0;
+        }
+
+        .widget-label {
+            font-weight: bold;
+            color: var(--primary-blue-dark);
+            font-size: 0.95rem;
+        }
+
+        .widget-slider {
+            flex: 1;
+            margin: 0 15px;
+            accent-color: var(--primary-orange);
+        }
+
+        .widget-val {
+            font-size: 1.15rem;
+            font-weight: bold;
+            color: var(--primary-orange);
+            width: 80px;
+            text-align: right;
+        }
+
+        .conversion-grid {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            justify-content: space-around;
+        }
+
+        .conversion-box {
+            background: white;
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            flex: 1;
+            text-align: center;
+        }
+
+        .conversion-val {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--primary-blue-dark);
+        }
+
+        .conversion-lbl {
+            font-size: 0.78rem;
+            color: #64748b;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app-container">
+        <header id="global-header">
+            <span>Colegio Escolaris - Matemática 5to Bachillerato</span>
+            <span>Guía 22: Aplicación de Derivadas</span>
+        </header>
+
+        <div id="viewport">
+            <div class="slide-container" id="slide-container">
+                
+                <!-- 1. Portada -->
+                <div class="slide active">
+                    <div style="font-size: 75px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));">🚗📈⚡</div>
+                    <h1>Aplicación de Derivadas</h1>
+                    <h2>Lección 22 &bull; 5&deg; Bachillerato</h2>
+                    <p style="color: #64748b; font-style: italic;">¡Interpretación física de la derivada, velocidad instantánea, aceleración y resolución de problemas para estudio universitario!</p>
+                </div>
+
+                <!-- 2. ¿Qué es Teóricamente una Derivada y Por Qué Importa? -->
+                <div class="slide">
+                    <h2>¿Qué es Teóricamente una Derivada?</h2>
+                    <p>La <strong>derivada</strong> de una función $y = f(x)$ es la medida matemática exacta de la <strong>razón de cambio instantánea</strong> con la que cambia la variable dependiente $y$ cuando varía la variable independiente $x$:</p>
+
+                    <div class="info-card" style="border-left: 5px solid var(--primary-orange); background: #fffbeb; padding: 12px 18px; margin: 8px 0;">
+                        <h3 style="color: var(--primary-orange); margin-bottom: 4px; font-size: 1.1rem;">Definición Formal por Límite:</h3>
+                        <p style="font-size: 1.3rem; font-weight: bold; color: var(--primary-blue-dark); margin: 4px 0;">
+                            $$f'(x) = \lim_{\Delta x \to 0} \frac{f(x + \Delta x) - f(x)}{\Delta x} = \frac{dy}{dx}$$
+                        </p>
+                    </div>
+
+                    <div class="columns-container" style="gap: 12px; margin-top: 6px;">
+                        <div class="column-card" style="border-color: #0284c7; text-align: left; padding: 8px 12px;">
+                            <h3 style="color: #0284c7; font-size: 0.95rem;">📐 Significado Geométrico</h3>
+                            <p style="font-size: 0.84rem; color: #334155; line-height: 1.4;">Representa la <strong>pendiente de la recta tangente</strong> a la curva en cualquier punto específico $(x_0, f(x_0))$.</p>
+                        </div>
+                        <div class="column-card" style="border-color: var(--primary-green); text-align: left; padding: 8px 12px;">
+                            <h3 style="color: var(--primary-green); font-size: 0.95rem;">💡 ¿Por Qué es Importante Aplicarlas?</h3>
+                            <p style="font-size: 0.84rem; color: #334155; line-height: 1.4;">Permite predecir comportamientos en tiempo real: hallar la <strong>velocidad exacta</strong> de un vehículo, optimizar ganancias y diseñar estructuras.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. La Derivada en Gráficas de Posición, Velocidad y Aceleración -->
+                <div class="slide">
+                    <h2>La Derivada en Gráficas de Movimiento</h2>
+                    <p>En física, las derivadas conectan las funciones de <strong>posición $s(t)$</strong>, <strong>velocidad $v(t)$</strong> y <strong>aceleración $a(t)$</strong>:</p>
+
+                    <!-- SVG Ilustrativo de la Gráfica Distancia vs Tiempo con Recta Tangente (Velocidad) -->
+                    <div style="margin: 6px 0; background: #ffffff; padding: 12px 16px; border-radius: 14px; border: 2px solid #cbd5e1; box-shadow: 0 4px 6px rgba(0,0,0,0.03); width: 100%; max-width: 780px;">
+                        <svg width="520" height="190" viewBox="0 0 520 190" style="display: block; margin: auto;">
+                            <!-- Ejes Cartesianos -->
+                            <line x1="50" y1="160" x2="480" y2="160" stroke="#64748b" stroke-width="2.5"/>
+                            <line x1="50" y1="160" x2="50" y2="20" stroke="#64748b" stroke-width="2.5"/>
+                            <text x="485" y="165" fill="#64748b" font-weight="bold" font-size="14">Tiempo t (s)</text>
+                            <text x="45" y="14" fill="#64748b" font-weight="bold" font-size="14" text-anchor="end">Posición s(t) (m)</text>
+
+                            <!-- Curva de Posición s(t) = t^2 -->
+                            <path d="M 50,150 Q 200,140 430,30" fill="none" stroke="#0284c7" stroke-width="3.5"/>
+                            <text x="435" y="25" fill="#0284c7" font-weight="bold" font-size="14">Curva s(t)</text>
+
+                            <!-- Punto de Evaluación t_0 = 3 -->
+                            <circle cx="260" cy="98" r="6" fill="#db6015"/>
+                            <line x1="260" y1="160" x2="260" y2="98" stroke="#cbd5e1" stroke-dasharray="4,4" stroke-width="2"/>
+                            <text x="260" y="178" fill="#db6015" font-weight="bold" font-size="13" text-anchor="middle">Instante t_0</text>
+
+                            <!-- Recta Tangente en t_0 (Pendiente = Velocidad Instantánea v(t)) -->
+                            <line x1="140" y1="148" x2="380" y2="48" stroke="#db6015" stroke-width="3"/>
+                            <text x="385" y="45" fill="#db6015" font-weight="bold" font-size="14">Recta Tangente (m = v(t))</text>
+
+                            <!-- Triángulo de Inclinación ds/dt -->
+                            <path d="M 260,98 L 340,98 L 340,65" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-dasharray="3,3"/>
+                            <text x="300" y="112" fill="#22c55e" font-weight="bold" font-size="12">Δt</text>
+                            <text x="350" y="85" fill="#22c55e" font-weight="bold" font-size="12">Δs</text>
+                        </svg>
+                    </div>
+
+                    <div class="info-card" style="border-left: 5px solid var(--primary-green); background: #f0fdf4; padding: 10px 16px; margin-top: 4px; text-align: left;">
+                        <p style="font-size: 0.95rem; color: #166534; margin: 2px 0; line-height: 1.6;">
+                            ⚡ <strong>Velocidad Instantánea:</strong> $v(t) = s'(t) = \frac{ds}{dt}$ &emsp;(1&ordf; Derivada de la Posición)
+                        </p>
+                        <p style="font-size: 0.95rem; color: #166534; margin: 2px 0; line-height: 1.6;">
+                            🚗 <strong>Aceleración Instantánea:</strong> $a(t) = v'(t) = s''(t) = \frac{d^2s}{dt^2}$ &emsp;(2&ordf; Derivada de la Posición)
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 4. Ejemplo 1: Cálculo de Velocidad y Aceleración de un Vehículo (Libro de Texto) -->
+                <div class="slide">
+                    <h2>Ejemplo 1: Velocidad y Aceleración Instantánea</h2>
+                    <p style="margin-bottom: 4px;">Un vehículo se mueve según la función de posición $s(t) = 2t^3 - 6t^2 + 10t$ (metros en segundos). Hallar su velocidad y aceleración en $t = 3 \text{ s}$.</p>
+
+                    <table class="textbook-table">
+                        <thead>
+                            <tr>
+                                <th class="pyramid-col">Desarrollo Matemático (Pirámide Inversa)</th>
+                                <th class="explain-col">Justificación y Explicación del Nivel</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="pyramid-col">$v(t) = s'(t) = \frac{d}{dt}[2t^3 - 6t^2 + 10t]$</td>
+                                <td class="explain-col"><strong>Nivel 1: Definición de Velocidad.</strong> Calculamos la primera derivada de la posición con respecto al tiempo.</td>
+                            </tr>
+                            <tr>
+                                <td class="pyramid-col">$v(t) = 6t^2 - 12t + 10$</td>
+                                <td class="explain-col"><strong>Nivel 2: Regla de la Potencia.</strong> Derivamos cada término: $\frac{d}{dt}(2t^3)=6t^2$, $\frac{d}{dt}(-6t^2)=-12t$.</td>
+                            </tr>
+                            <tr>
+                                <td class="pyramid-col">$v(3) = 6(3)^2 - 12(3) + 10 = 54 - 36 + 10 = \mathbf{28 \text{ m/s}}$</td>
+                                <td class="explain-col"><strong>Nivel 3: Evaluación de Velocidad.</strong> Sustituimos $t = 3 \text{ s}$ obteniendo la velocidad instantánea del auto.</td>
+                            </tr>
+                            <tr>
+                                <td class="pyramid-col">$a(t) = v'(t) = \frac{d}{dt}[6t^2 - 12t + 10] = 12t - 12$</td>
+                                <td class="explain-col"><strong>Nivel 4: Definición de Aceleración.</strong> Derivamos la función velocidad $v(t)$ para obtener $a(t)$.</td>
+                            </tr>
+                            <tr>
+                                <td class="pyramid-col" style="color: var(--primary-green); font-weight: bold;">$a(3) = 12(3) - 12 = 36 - 12 = \mathbf{24 \text{ m/s}^2}$</td>
+                                <td class="explain-col"><strong>Nivel 5: Solución Final.</strong> Evaluamos $t = 3 \text{ s}$ hallando la aceleración instantánea en ese segundo.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 5. Ejemplo 2: Proyectil en Tiro Vertical (Libro de Texto) -->
+                <div class="slide">
+                    <h2>Ejemplo 2: Tiro Vertical y Altura Máxima</h2>
+                    <p style="margin-bottom: 4px;">Un proyectil lanzado verticalmente se rige por $h(t) = 40t - 5t^2$ (metros). Hallar el tiempo para alcanzar la altura máxima y su velocidad en ese punto.</p>
+
+                    <table class="textbook-table">
+                        <thead>
+                            <tr>
+                                <th class="pyramid-col">Desarrollo Matemático (Pirámide Inversa)</th>
+                                <th class="explain-col">Justificación y Explicación del Nivel</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="pyramid-col">$v(t) = h'(t) = 40 - 10t$</td>
+                                <td class="explain-col"><strong>Nivel 1: Función de Velocidad.</strong> Derivamos la función de altura $h(t)$ obteniendo la velocidad instantánea.</td>
+                            </tr>
+                            <tr>
+                                <td class="pyramid-col">$v(t) = 0 \implies 40 - 10t = 0$</td>
+                                <td class="explain-col"><strong>Nivel 2: Condición Física de Altura Máxima.</strong> En el punto más alto la velocidad instantánea se anula ($v = 0$).</td>
+                            </tr>
+                            <tr>
+                                <td class="pyramid-col">$10t = 40 \implies t = \frac{40}{10} = \mathbf{4 \text{ segundos}}$</td>
+                                <td class="explain-col"><strong>Nivel 3: Despeje del Tiempo Crítico.</strong> Resolvemos la ecuación encontrando que tarda 4 segundos en subir.</td>
+                            </tr>
+                            <tr>
+                                <td class="pyramid-col" style="color: var(--primary-orange); font-weight: bold;">$h(4) = 40(4) - 5(4)^2 = 160 - 80 = \mathbf{80 \text{ metros}}$</td>
+                                <td class="explain-col"><strong>Nivel 4: Solución de Altura Máxima.</strong> Sustituimos $t = 4$ en $h(t)$ obteniendo la altura máxima alcanzada.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 6. Criterios de la Segunda Derivada -->
+                <div class="slide">
+                    <h2>Criterios para Máximos y Mínimos</h2>
+                    <p>Herramientas analíticas para clasificar los puntos críticos de una función continua $f(x)$:</p>
+
+                    <div class="columns-container" style="gap: 15px;">
+                        <div class="column-card" style="border-color: var(--primary-green); padding: 12px;">
+                            <div class="column-card-title" style="color: var(--primary-green); font-size: 1.1rem;">Criterio de la 1&ordf; Derivada</div>
+                            <p style="font-size: 0.88rem; text-align: left; color: #334155; line-height: 1.6;">
+                                🟢 <strong>Máximo Relativo:</strong> $f'(x)$ cambia de signo de $(+)$ a $(-)$ al pasar por $c$.<br>
+                                🔴 <strong>Mínimo Relativo:</strong> $f'(x)$ cambia de signo de $(-)$ a $(+)$ al pasar por $c$.
+                            </p>
+                        </div>
+                        <div class="column-card" style="border-color: var(--primary-purple); padding: 12px;">
+                            <div class="column-card-title" style="color: var(--primary-purple); font-size: 1.1rem;">Criterio de la 2&ordf; Derivada</div>
+                            <p style="font-size: 0.88rem; text-align: left; color: #334155; line-height: 1.6;">
+                                📉 Si $f'(c) = 0$ y $f''(c) < 0 \implies$ <strong>Máximo Relativo</strong> (concavidad hacia abajo).<br>
+                                📈 Si $f'(c) = 0$ y $f''(c) > 0 \implies$ <strong>Mínimo Relativo</strong> (concavidad hacia arriba).
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. Simulador Interactivo de Derivadas -->
+                <div class="slide">
+                    <h2>¡Simulador Interactivo de Velocidad Instantánea!</h2>
+                    <p>Mueve el instante $t$ en la trayectoria $s(t) = t^2$ para observar la inclinación de la velocidad $v(t) = 2t$:</p>
+                    
+                    <div class="widget-box">
+                        <div class="widget-row">
+                            <span class="widget-label">Tiempo transcurrido (t):</span>
+                            <input type="range" min="0" max="10" value="3" step="0.5" class="widget-slider" id="deriv-slider" oninput="simularDerivada(this.value)">
+                            <span class="widget-val" id="val-x">t = 3.0 s</span>
+                        </div>
+                        
+                        <div class="conversion-grid">
+                            <div class="conversion-box">
+                                <span class="conversion-val" id="res-fx" style="color: var(--primary-purple);">s(3.0) = 9.00 m</span>
+                                <span class="conversion-lbl">Posición Recorrida $s(t)$</span>
+                            </div>
+                            <div class="conversion-box">
+                                <span class="conversion-val" id="res-fprim" style="color: var(--primary-green);">v = 6.00 m/s</span>
+                                <span class="conversion-lbl">Velocidad Instantánea $v(t) = s'(t)$</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 8. QUIZ 1 -->
+                <div class="slide">
+                    <h2>Reto 1: Relación entre Posición y Velocidad</h2>
+                    <p>En el estudio de movimiento rectilíneo continuo...</p>
+                    <p style="font-weight: bold; color: var(--primary-blue-dark);">¿Cómo se obtiene formalmente la velocidad instantánea $v(t)$ a partir de la posición $s(t)$?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(1, true, this, '¡Correcto! La velocidad es la primera derivada de la función de posición: v(t) = s\'(t).', '')">A) Calculando la primera derivada de la posición con respecto al tiempo ($v(t) = s'(t)$).</button>
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'La segunda derivada s\'\'(t) representa la aceleración, no la velocidad.')">B) Calculando la segunda derivada de la posición ($v(t) = s''(t)$).</button>
+                        <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'Dividir la posición total entre el tiempo total da la velocidad media, no la instantánea.')">C) Dividiendo el valor final de posición entre el tiempo total.</button>
+                    </div>
+                    <div id="feedback-1" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 9. QUIZ 2 -->
+                <div class="slide">
+                    <h2>Reto 2: Condición de Altura Máxima</h2>
+                    <p>Cuando un objeto es lanzado verticalmente hacia arriba y alcanza su punto más alto...</p>
+                    <p style="font-weight: bold; color: var(--primary-blue-dark);">¿Qué valor toma su velocidad instantánea en ese preciso momento?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(2, true, this, '¡Excelente! En el punto culminante el objeto se detiene un instante, por lo que v(t) = 0 m/s.', '')">A) Su velocidad instantánea es igual a cero ($v(t) = 0 \text{ m/s}$).</button>
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'La velocidad no es máxima en la cumbre; es cero justo al cambiar de sentido.')">B) Su velocidad alcanza el valor máximo positivo de todo el trayecto.</button>
+                        <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'La aceleración de la gravedad actúa en todo momento, pero v = 0.')">C) Su aceleración se hace cero.</button>
+                    </div>
+                    <div id="feedback-2" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 10. QUIZ 3 -->
+                <div class="slide">
+                    <h2>Reto 3: Cálculo de Aceleración</h2>
+                    <p>Si la velocidad de una partícula es $v(t) = 5t^2 + 4$, ¿cuál es su aceleración en $t = 2 \text{ segundos}$?</p>
+                    <p style="font-weight: bold; color: var(--primary-blue-dark);">¿Cuál es el valor de la aceleración $a(2)$?</p>
+                    <div class="quiz-container">
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'a(t) = v\'(t) = 10t. Evalúa en t = 2 s.')">A) 14 m/s²</button>
+                        <button class="option-btn" onclick="checkQuiz(3, true, this, '¡Perfecto! a(t) = v\'(t) = 10t. Evaluando en t = 2 → a(2) = 10(2) = 20 m/s².', '')">B) 20 m/s²</button>
+                        <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'Deriva 5t² + 4 para obtener 10t.')">C) 24 m/s²</button>
+                    </div>
+                    <div id="feedback-3" style="margin-top: 1rem; font-weight: 600; min-height: 24px;"></div>
+                </div>
+
+                <!-- 11. Final -->
+                <div class="slide">
+                    <div style="font-size: 80px;">🎯</div>
+                    <h2>¡Misión Cumplida!</h2>
+                    <p>¡Has comprendido la aplicación física y geométrica formal de la derivada!</p>
+                    <button onclick="goToSlide(0)"
+                        style="background: var(--primary-orange); color: white; border: none; padding: 1rem 2rem; border-radius: 30px; font-weight: 700; cursor: pointer; margin-top: 1.5rem; font-size: 1.1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">Volver a estudiar</button>
+                </div>
+
+            </div>
+        </div>
+
+        <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled aria-label="Anterior">&#8592;</button>
+        <button class="nav-btn" id="next-btn" onclick="nextSlide()" aria-label="Siguiente">&#8594;</button>
+
+        <div class="slide-indicators">
+            <span id="slide-num">1 / 11</span>
+        </div>
+
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const totalSlides = 11;
+        const slideContainer = document.getElementById('slide-container');
+        const slideNumDisplay = document.getElementById('slide-num');
+        const progressBar = document.getElementById('progress-bar');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+
+        function updateSlide() {
+            slideContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
+            slideNumDisplay.textContent = `${currentSlide + 1} / ${totalSlides}`;
+            
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            progressBar.style.width = `${progress}%`;
+
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === totalSlides - 1;
+
+            const slides = document.querySelectorAll('.slide');
+            slides.forEach((slide, index) => {
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+
+            if (window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        function goToSlide(num) {
+            currentSlide = num;
+            updateSlide();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        function simularDerivada(val) {
+            const t = parseFloat(val);
+            document.getElementById('val-x').textContent = `t = ${t.toFixed(1)} s`;
+            const st = Math.pow(t, 2);
+            const vt = 2 * t;
+            
+            document.getElementById('res-fx').textContent = `s(${t.toFixed(1)}) = ${st.toFixed(2)} m`;
+            document.getElementById('res-fprim').textContent = `v = ${vt.toFixed(2)} m/s`;
+        }
+
+        function checkQuiz(quizNum, isCorrect, btnElement, correctMsg, wrongMsg) {
+            const container = btnElement.parentElement;
+            const buttons = container.querySelectorAll('.option-btn');
+            const feedback = document.getElementById(`feedback-${quizNum}`);
+
+            buttons.forEach(btn => {
+                btn.style.borderColor = '#e2e8f0';
+                btn.style.background = 'white';
+                btn.style.color = '#1e293b';
+            });
+
+            if (isCorrect) {
+                btnElement.style.borderColor = 'var(--primary-green)';
+                btnElement.style.background = '#f0fdf4';
+                btnElement.style.color = '#166534';
+                feedback.style.color = 'var(--primary-green)';
+                feedback.textContent = correctMsg;
+            } else {
+                btnElement.style.borderColor = 'var(--primary-red)';
+                btnElement.style.background = '#fef2f2';
+                btnElement.style.color = '#991b1b';
+                feedback.style.color = '#991b1b';
+                feedback.textContent = wrongMsg;
+            }
+        }
+
+        // Initialize progress bar and slider state
+        updateSlide();
+    </script>
+</body>
+
+</html>
