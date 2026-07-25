@@ -424,23 +424,23 @@
                 <!-- 2. ¿Qué es Teóricamente una Derivada y Por Qué Importa? -->
                 <div class="slide">
                     <h2>¿Qué es Teóricamente una Derivada?</h2>
-                    <p>La <strong>derivada</strong> de una función $y = f(x)$ es la medida matemática exacta de la <strong>razón de cambio instantánea</strong> con la que cambia la variable dependiente $y$ cuando varía la variable independiente $x$:</p>
+                    <p>La <strong>derivada</strong> de una función $y = f(x)$ mide la velocidad con la que cambia una variable en un instante preciso:</p>
 
-                    <div class="info-card" style="border-left: 5px solid var(--primary-orange); background: #fffbeb; padding: 12px 18px; margin: 8px 0;">
-                        <h3 style="color: var(--primary-orange); margin-bottom: 4px; font-size: 1.1rem;">Definición Formal por Límite:</h3>
-                        <p style="font-size: 1.3rem; font-weight: bold; color: var(--primary-blue-dark); margin: 4px 0;">
-                            $$f'(x) = \lim_{\Delta x \to 0} \frac{f(x + \Delta x) - f(x)}{\Delta x} = \frac{dy}{dx}$$
+                    <div class="info-card" style="border-left: 5px solid var(--primary-orange); background: #fffbeb; padding: 10px 16px; margin: 6px 0;">
+                        <h3 style="color: var(--primary-orange); margin-bottom: 4px; font-size: 1.15rem;">💡 En Palabras Simples:</h3>
+                        <p style="font-size: 1.05rem; font-weight: bold; color: var(--primary-blue-dark); margin: 4px 0; line-height: 1.5;">
+                            "La derivada es la <u>inclinación (pendiente)</u> de la línea tangente que <u>toca a la curva en un solo punto exacto</u>."
                         </p>
                     </div>
 
                     <div class="columns-container" style="gap: 12px; margin-top: 6px;">
                         <div class="column-card" style="border-color: #0284c7; text-align: left; padding: 8px 12px;">
-                            <h3 style="color: #0284c7; font-size: 0.95rem;">📐 Significado Geométrico</h3>
-                            <p style="font-size: 0.84rem; color: #334155; line-height: 1.4;">Representa la <strong>pendiente de la recta tangente</strong> a la curva en cualquier punto específico $(x_0, f(x_0))$.</p>
+                            <h3 style="color: #0284c7; font-size: 0.95rem;">📐 Definición Matemática Formal</h3>
+                            <p style="font-size: 0.84rem; color: #334155; line-height: 1.4;">$$f'(x) = \lim_{\Delta x \to 0} \frac{f(x + \Delta x) - f(x)}{\Delta x} = \frac{dy}{dx}$$</p>
                         </div>
                         <div class="column-card" style="border-color: var(--primary-green); text-align: left; padding: 8px 12px;">
-                            <h3 style="color: var(--primary-green); font-size: 0.95rem;">💡 ¿Por Qué es Importante Aplicarlas?</h3>
-                            <p style="font-size: 0.84rem; color: #334155; line-height: 1.4;">Permite predecir comportamientos en tiempo real: hallar la <strong>velocidad exacta</strong> de un vehículo, optimizar ganancias y diseñar estructuras.</p>
+                            <h3 style="color: var(--primary-green); font-size: 0.95rem;">🎯 ¿Por Qué es Importante Aplicarla?</h3>
+                            <p style="font-size: 0.84rem; color: #334155; line-height: 1.4;">Nos da el ritmo instantáneo exacto: la <strong>velocidad real</strong> de un auto en un segundo, o el punto de <strong>máxima ganancia</strong>.</p>
                         </div>
                     </div>
                 </div>
@@ -582,28 +582,54 @@
                     </div>
                 </div>
 
-                <!-- 7. Simulador Interactivo de Derivadas -->
+                <!-- 7. Simulador Interactivo de Derivadas con Gráfica Dinámica -->
                 <div class="slide">
-                    <h2>¡Simulador Interactivo de Velocidad Instantánea!</h2>
-                    <p>Mueve el instante $t$ en la trayectoria $s(t) = t^2$ para observar la inclinación de la velocidad $v(t) = 2t$:</p>
-                    
-                    <div class="widget-box">
-                        <div class="widget-row">
-                            <span class="widget-label">Tiempo transcurrido (t):</span>
-                            <input type="range" min="0" max="10" value="3" step="0.5" class="widget-slider" id="deriv-slider" oninput="simularDerivada(this.value)">
-                            <span class="widget-val" id="val-x">t = 3.0 s</span>
-                        </div>
+                    <h2 style="font-size: 1.45rem; margin-bottom: 0.2rem;">¡Simulador Dinámico: Gráfica de Movimiento y Derivada!</h2>
+                    <p style="font-size: 0.88rem; margin-bottom: 0.3rem;">Mueve el control de tiempo $t$ para ver cómo se desplaza el punto sobre la curva $s(t) = 0.5t^2$ y cómo cambia la inclinación de la recta tangente $v(t) = s'(t) = t$:</p>
+
+                    <div style="display: flex; gap: 15px; width: 100%; max-width: 820px; align-items: center; justify-content: center; background: #ffffff; padding: 12px 18px; border-radius: 16px; border: 2px solid #cbd5e1; box-shadow: 0 4px 10px rgba(0,0,0,0.04); margin-top: 4px;">
                         
-                        <div class="conversion-grid">
-                            <div class="conversion-box">
-                                <span class="conversion-val" id="res-fx" style="color: var(--primary-purple);">s(3.0) = 9.00 m</span>
-                                <span class="conversion-lbl">Posición Recorrida $s(t)$</span>
+                        <!-- SVG Gráfica Dinámica Animada -->
+                        <div style="flex: 1.1; max-width: 420px;">
+                            <svg id="sim-svg" width="400" height="200" viewBox="0 0 400 200" style="display: block; margin: auto; background: #f8fafc; border-radius: 12px; border: 1px solid #cbd5e1;">
+                                <!-- Ejes t vs s -->
+                                <line x1="40" y1="170" x2="380" y2="170" stroke="#64748b" stroke-width="2"/>
+                                <line x1="40" y1="170" x2="40" y2="20" stroke="#64748b" stroke-width="2"/>
+                                <text x="382" y="174" fill="#64748b" font-weight="bold" font-size="12">t (s)</text>
+                                <text x="36" y="15" fill="#64748b" font-weight="bold" font-size="12" text-anchor="end">s(t) (m)</text>
+
+                                <!-- Parábola Exacta s(t) = 0.05 * t^2 -->
+                                <!-- t de 0 a 7.5: x_px = 40 + t*40, y_px = 170 - (0.05*t^2)*40 -->
+                                <path d="M 40,170 Q 190,170 340,57.5" fill="none" stroke="#0284c7" stroke-width="3.5"/>
+
+                                <!-- Recta Tangente Dinámica en tiempo real -->
+                                <line id="tangent-line" x1="40" y1="170" x2="360" y2="50" stroke="#db6015" stroke-width="3"/>
+
+                                <!-- Punto móvil sobre la curva -->
+                                <circle id="moving-dot" cx="160" cy="149" r="6" fill="#db6015"/>
+                                <line id="dot-guideline" x1="160" y1="170" x2="160" y2="149" stroke="#cbd5e1" stroke-dasharray="3,3" stroke-width="1.5"/>
+                            </svg>
+                        </div>
+
+                        <!-- Panel de Controles y Resultados 'Derivada igual a' -->
+                        <div style="flex: 0.9; text-align: left; display: flex; flex-direction: column; gap: 8px;">
+                            <div style="background: #f1f5f9; padding: 10px 14px; border-radius: 12px; border: 1px solid #cbd5e1;">
+                                <label style="font-weight: bold; color: var(--primary-blue-dark); font-size: 0.88rem; display: block; margin-bottom: 4px;">Instante de Tiempo (t):</label>
+                                <input type="range" min="0" max="8" value="3" step="0.2" class="widget-slider" id="deriv-slider" style="width: 100%;" oninput="simularDerivada(this.value)">
+                                <div style="text-align: right; font-weight: bold; color: var(--primary-orange); font-size: 1rem;" id="val-x">t = 3.0 s</div>
                             </div>
-                            <div class="conversion-box">
-                                <span class="conversion-val" id="res-fprim" style="color: var(--primary-green);">v = 6.00 m/s</span>
-                                <span class="conversion-lbl">Velocidad Instantánea $v(t) = s'(t)$</span>
+
+                            <div style="background: #f0fdf4; padding: 8px 12px; border-radius: 12px; border: 2px solid var(--primary-green);">
+                                <span style="font-size: 0.78rem; color: #166534; font-weight: bold; display: block;">POSICIÓN RECORRIDA:</span>
+                                <span id="res-fx" style="font-size: 1.1rem; font-weight: bold; color: var(--primary-blue-dark);">s(3.0) = 4.50 m</span>
+                            </div>
+
+                            <div style="background: #fffbeb; padding: 8px 12px; border-radius: 12px; border: 2px solid var(--primary-orange);">
+                                <span style="font-size: 0.8rem; color: var(--primary-orange); font-weight: bold; display: block;">DERIVADA IGUAL A:</span>
+                                <span id="res-fprim" style="font-size: 1.15rem; font-weight: bold; color: var(--primary-orange);">v(t) = s'(t) = 3.00 m/s</span>
                             </div>
                         </div>
+
                     </div>
                 </div>
 
@@ -730,11 +756,50 @@
         function simularDerivada(val) {
             const t = parseFloat(val);
             document.getElementById('val-x').textContent = `t = ${t.toFixed(1)} s`;
-            const st = Math.pow(t, 2);
-            const vt = 2 * t;
+            
+            // Ecuación s(t) = 0.5 * t^2 -> v(t) = s'(t) = t
+            const st = 0.5 * Math.pow(t, 2);
+            const vt = t;
             
             document.getElementById('res-fx').textContent = `s(${t.toFixed(1)}) = ${st.toFixed(2)} m`;
-            document.getElementById('res-fprim').textContent = `v = ${vt.toFixed(2)} m/s`;
+            document.getElementById('res-fprim').textContent = `v(t) = s'(t) = ${vt.toFixed(2)} m/s`;
+
+            // Mapeo paramétrico exacto de la curva Bézier Q(40,170 -> 190,170 -> 340,57.5)
+            // t_param va de 0 a 1 cuando t va de 0 a 7.5
+            const u = Math.min(1, Math.max(0, t / 7.5));
+            const cx = (1 - u)*(1 - u)*40 + 2*(1 - u)*u*190 + u*u*340;
+            const cy = (1 - u)*(1 - u)*170 + 2*(1 - u)*u*170 + u*u*57.5;
+
+            // Derivada paramétrica exacta dy/dx de la curva Bézier para Tangente 100% Exacta
+            const dx_du = 2*(1 - u)*(190 - 40) + 2*u*(340 - 190);
+            const dy_du = 2*(1 - u)*(170 - 170) + 2*u*(57.5 - 170);
+            const slope_px = dy_du / dx_du; // dy/dx en píxeles
+
+            // Mover Punto y Línea Guía en SVG
+            const dot = document.getElementById('moving-dot');
+            const guideline = document.getElementById('dot-guideline');
+            if (dot && guideline) {
+                dot.setAttribute('cx', cx);
+                dot.setAttribute('cy', cy);
+                guideline.setAttribute('x1', cx);
+                guideline.setAttribute('x2', cx);
+                guideline.setAttribute('y2', cy);
+            }
+
+            // Mover la Recta Tangente (Extendida exactamente a lo largo de la tangente trazada)
+            const tangent = document.getElementById('tangent-line');
+            if (tangent) {
+                const len = 55; // longitud del segmento tangente a cada lado
+                // Vector unitario tangente (ux, uy)
+                const norm = Math.sqrt(1 + slope_px * slope_px);
+                const ux = 1 / norm;
+                const uy = slope_px / norm;
+
+                tangent.setAttribute('x1', cx - len * ux);
+                tangent.setAttribute('y1', cy - len * uy);
+                tangent.setAttribute('x2', cx + len * ux);
+                tangent.setAttribute('y2', cy + len * uy);
+            }
         }
 
         function checkQuiz(quizNum, isCorrect, btnElement, correctMsg, wrongMsg) {
