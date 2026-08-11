@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lección 2: Representación Gráfica de Funciones Trigonométricas - 5to Bachillerato</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary-orange: #db6015;
+            --primary-yellow: #f7be00;
+            --primary-blue-dark: #244b5a;
+            --primary-green: #22c55e;
+            --primary-red: #ef4444;
+            --primary-purple: #8b5cf6;
+            --bg-light: #f8fafc;
+            --transition-speed: 0.5s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e2e8f0;
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 960px;
+            height: 540px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: auto;
+        }
+
+        header {
+            background-color: var(--primary-blue-dark);
+            color: white;
+            padding: 0 1.5rem;
+            height: 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            z-index: 200;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        #viewport {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        .slide-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            padding: 12px 65px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+            overflow-y: auto;
+        }
+
+        .slide.active { opacity: 1; }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.1rem;
+            color: var(--primary-orange);
+            margin-bottom: 0.4rem;
+            font-weight: 800;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            color: var(--primary-blue-dark);
+            margin-bottom: 0.2rem;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 0.92rem;
+            color: #444;
+            max-width: 820px;
+            line-height: 1.5;
+            margin-bottom: 0.3rem;
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            z-index: 250;
+            border: 1px solid #ddd;
+            color: var(--primary-blue-dark);
+            font-size: 1.3rem;
+            user-select: none;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-50%) scale(1.1);
+            color: var(--primary-orange);
+            border-color: var(--primary-orange);
+        }
+
+        .nav-btn:disabled { opacity: 0; pointer-events: none; }
+        #prev-btn { left: 15px; }
+        #next-btn { right: 15px; }
+
+        .slide-indicators {
+            position: absolute;
+            bottom: 1.2rem;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            font-size: 0.85rem;
+            color: #888;
+            z-index: 100;
+        }
+
+        .progress-bar-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: #edf2f7;
+            z-index: 100;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--primary-orange);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            width: 100%;
+            max-width: 620px;
+            margin: 0.4rem auto;
+        }
+
+        .option-btn {
+            padding: 0.7rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-orange);
+            background: #fffcf9;
+        }
+
+        .content-box-vertical {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 820px;
+            flex: 1;
+            margin: 4px 0;
+        }
+
+        .interactive-btn {
+            background: var(--primary-orange);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .interactive-btn:hover { background: #c4500e; }
+
+        input[type=range] {
+            width: 100%;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app-container">
+        <header id="global-header">
+            <span>Colegio Escolaris - Matemática 5to Bachillerato</span>
+            <span>Lección 2: Gráficas Trigonométricas</span>
+        </header>
+
+        <div id="viewport">
+            <div class="slide-container" id="slide-container">
+                
+                <!-- Slide 1: Portada -->
+                <div class="slide active">
+                    <div class="content-box-vertical">
+                        <div style="font-size: 80px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));">📈🌊〰️</div>
+                        <h1>Gráficas Trigonométricas</h1>
+                        <h2>Lección 2 &bull; 5&deg; Bachillerato</h2>
+                        <p style="color: #64748b; font-style: italic;">Descubre cómo el movimiento circular se transforma en las ondas que describen el sonido, la luz y la naturaleza.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 2: Función Seno -->
+                <div class="slide">
+                    <h2>La Función Seno ($y = \sin x$)</h2>
+                    <p>Si desenrollamos la circunferencia unitaria a lo largo del eje $x$, las coordenadas $y$ (Seno) forman una onda continua y periódica.</p>
+                    <div class="content-box-vertical" style="background: #ffffff; padding: 14px 20px; border-radius: 16px; border: 2px solid #cbd5e1;">
+                        <svg width="600" height="150" viewBox="0 0 600 150" style="display: block; margin: auto;">
+                            <!-- Ejes -->
+                            <line x1="20" y1="75" x2="580" y2="75" stroke="#94a3b8" stroke-width="2" />
+                            <line x1="50" y1="10" x2="50" y2="140" stroke="#94a3b8" stroke-width="2" />
+                            
+                            <!-- Onda Seno (approximate with cubic beziers for smoothness) -->
+                            <path d="M 50,75 C 90,0 130,0 175,75 C 220,150 260,150 300,75 C 340,0 380,0 425,75 C 470,150 510,150 550,75" fill="none" stroke="#22c55e" stroke-width="3"/>
+                            
+                            <!-- Puntos Clave -->
+                            <circle cx="50" cy="75" r="4" fill="#1e293b"/>
+                            <text x="35" y="90" fill="#64748b" font-size="12">0</text>
+                            
+                            <circle cx="112.5" cy="18" r="4" fill="#db6015"/>
+                            <text x="112.5" y="10" fill="#db6015" font-size="12" text-anchor="middle">&pi;/2</text>
+                            
+                            <circle cx="175" cy="75" r="4" fill="#1e293b"/>
+                            <text x="175" y="90" fill="#64748b" font-size="12" text-anchor="middle">&pi;</text>
+
+                            <circle cx="237.5" cy="132" r="4" fill="#db6015"/>
+                            <text x="237.5" y="145" fill="#db6015" font-size="12" text-anchor="middle">3&pi;/2</text>
+                            
+                            <circle cx="300" cy="75" r="4" fill="#1e293b"/>
+                            <text x="300" y="90" fill="#64748b" font-size="12" text-anchor="middle">2&pi;</text>
+                        </svg>
+
+                        <div style="background: #f0fdf4; border: 2px solid #22c55e; border-radius: 12px; padding: 6px 14px; margin-top: 8px; width: 100%;">
+                            <p style="font-size: 0.95rem; color: #166534; margin: 0; font-weight: bold;">
+                                El seno arranca en $(0,0)$, sube a su máximo en $\pi/2$, y completa un ciclo en $2\pi$.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 3: Partes de la onda -->
+                <div class="slide">
+                    <h2>Anatomía de una Onda</h2>
+                    <p>Las gráficas trigonométricas tienen características clave que definen su forma y comportamiento:</p>
+                    <div class="content-box-vertical" style="background: #ffffff; padding: 14px 20px; border-radius: 16px; border: 2px solid #cbd5e1;">
+                        <svg width="450" height="150" viewBox="0 0 450 150" style="display: block; margin: auto;">
+                            <!-- Ejes -->
+                            <line x1="20" y1="75" x2="430" y2="75" stroke="#94a3b8" stroke-width="2" />
+                            <line x1="50" y1="10" x2="50" y2="140" stroke="#94a3b8" stroke-width="2" />
+                            
+                            <!-- Onda -->
+                            <path d="M 50,75 C 90,0 130,0 175,75 C 220,150 260,150 300,75" fill="none" stroke="#8b5cf6" stroke-width="3" opacity="0.6"/>
+                            
+                            <!-- Cresta y Valle -->
+                            <circle cx="112.5" cy="18" r="5" fill="#db6015"/>
+                            <text x="112.5" y="10" fill="#db6015" font-weight="bold" font-size="12" text-anchor="middle">Cresta (Máximo)</text>
+
+                            <circle cx="237.5" cy="132" r="5" fill="#ef4444"/>
+                            <text x="237.5" y="145" fill="#ef4444" font-weight="bold" font-size="12" text-anchor="middle">Valle (Mínimo)</text>
+                            
+                            <!-- Amplitud -->
+                            <line x1="150" y1="18" x2="150" y2="75" stroke="#0284c7" stroke-width="3" />
+                            <line x1="145" y1="18" x2="155" y2="18" stroke="#0284c7" stroke-width="2"/>
+                            <line x1="145" y1="75" x2="155" y2="75" stroke="#0284c7" stroke-width="2"/>
+                            <text x="155" y="55" fill="#0284c7" font-weight="bold" font-size="12">Amplitud</text>
+
+                            <!-- Período -->
+                            <line x1="50" y1="95" x2="300" y2="95" stroke="#166534" stroke-width="2" stroke-dasharray="4"/>
+                            <text x="175" y="110" fill="#166534" font-weight="bold" font-size="12" text-anchor="middle">Período (1 Ciclo Completo)</text>
+                        </svg>
+                        
+                        <div style="display: flex; gap: 10px; width: 100%; margin-top: 8px;">
+                            <p style="font-size: 0.85rem; flex: 1; margin:0; text-align:left;"><strong>Amplitud:</strong> La altura máxima desde el centro.</p>
+                            <p style="font-size: 0.85rem; flex: 1; margin:0; text-align:left;"><strong>Período:</strong> La longitud horizontal que tarda en repetirse ($2\pi$ normalmente).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 4: Función Coseno -->
+                <div class="slide">
+                    <h2>La Función Coseno ($y = \cos x$)</h2>
+                    <p>La gráfica del Coseno es **idéntica** a la del Seno, pero está corrida (desfasada) hacia la izquierda por $\pi/2$.</p>
+                    <div class="content-box-vertical" style="background: #ffffff; padding: 14px 20px; border-radius: 16px; border: 2px solid #cbd5e1;">
+                        <svg width="500" height="150" viewBox="0 0 500 150" style="display: block; margin: auto;">
+                            <!-- Ejes -->
+                            <line x1="20" y1="75" x2="480" y2="75" stroke="#94a3b8" stroke-width="2" />
+                            <line x1="50" y1="10" x2="50" y2="140" stroke="#94a3b8" stroke-width="2" />
+                            
+                            <!-- Seno fantasma -->
+                            <path d="M 50,75 C 90,0 130,0 175,75 C 220,150 260,150 300,75" fill="none" stroke="#22c55e" stroke-width="2" stroke-dasharray="6,4" opacity="0.4"/>
+                            <text x="130" y="30" fill="#166534" font-size="12" opacity="0.5">Seno</text>
+                            
+                            <!-- Coseno -->
+                            <path d="M 50,18 C 70,18 90,75 112.5,75 C 150,75 170,132 200,132 C 230,132 250,75 287.5,75 C 310,75 330,18 350,18" fill="none" stroke="#0284c7" stroke-width="3"/>
+                            
+                            <!-- Puntos Clave Coseno -->
+                            <circle cx="50" cy="18" r="4" fill="#0369a1"/>
+                            <text x="35" y="25" fill="#0369a1" font-size="12">0</text>
+                            
+                            <circle cx="350" cy="18" r="4" fill="#0369a1"/>
+                            <text x="350" y="10" fill="#0369a1" font-size="12" text-anchor="middle">2&pi;</text>
+                        </svg>
+
+                        <div style="background: #e0f2fe; border: 2px solid #0284c7; border-radius: 12px; padding: 6px 14px; margin-top: 8px; width: 100%;">
+                            <p style="font-size: 0.95rem; color: #0369a1; margin: 0; font-weight: bold;">
+                                El Coseno arranca desde la cresta máxima $(0, 1)$ en el eje Y.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 5: Modificando la Onda -->
+                <div class="slide">
+                    <h2>Modificando la Ecuación: $y = A \sin(Bx)$</h2>
+                    <p>Al multiplicar el seno por constantes, podemos alterar radicalmente su forma gráfica.</p>
+                    <div class="content-box-vertical" style="background: #ffffff; padding: 14px 20px; border-radius: 16px; border: 2px solid #cbd5e1; display:flex; flex-direction:row; gap:15px; align-items:center;">
+                        <div style="flex: 1; text-align: left;">
+                            <p style="margin-bottom: 5px;">$$y = \mathbf{A} \sin(Bx)$$</p>
+                            <p style="font-size: 0.85rem; color: #334155; margin-bottom: 15px;">
+                                <strong style="color:#ef4444;">Amplitud (A):</strong> Estira o comprime la onda verticalmente. Altura = $|A|$. Si es negativa, se invierte.
+                            </p>
+                            <p style="margin-bottom: 5px;">$$y = A \sin(\mathbf{B}x)$$</p>
+                            <p style="font-size: 0.85rem; color: #334155;">
+                                <strong style="color:#8b5cf6;">Frecuencia Angular (B):</strong> Controla qué tan "apretada" está la onda. Afecta el período.<br>
+                                $\text{Período} = \frac{2\pi}{B}$
+                            </p>
+                        </div>
+                        <div style="flex: 1;">
+                            <svg width="250" height="150" viewBox="0 0 250 150" style="display: block; margin: auto;">
+                                <line x1="10" y1="75" x2="240" y2="75" stroke="#94a3b8" stroke-width="1" />
+                                <line x1="20" y1="10" x2="20" y2="140" stroke="#94a3b8" stroke-width="1" />
+                                <!-- Normal -->
+                                <path d="M 20,75 C 60,10 80,10 120,75 C 160,140 180,140 220,75" fill="none" stroke="#22c55e" stroke-width="2" opacity="0.3"/>
+                                <!-- Alta amplitud, mayor frecuencia -->
+                                <path d="M 20,75 C 30,-20 40,-20 70,75 C 100,170 110,170 120,75 C 130,-20 140,-20 170,75 C 200,170 210,170 220,75" fill="none" stroke="#ef4444" stroke-width="2"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 6: Laboratorio Visual -->
+                <div class="slide">
+                    <h2>Laboratorio Visual</h2>
+                    <p>Modifica los deslizadores para cambiar **A (Amplitud)** y **B (Frecuencia)** en la ecuación $y = A \sin(Bx)$.</p>
+                    <div class="content-box-vertical" style="background: #ffffff; padding: 10px 18px; border-radius: 16px; border: 2px solid #cbd5e1;">
+                        <svg width="450" height="150" viewBox="0 0 450 150" style="display: block; margin: auto;">
+                            <!-- Ejes -->
+                            <line x1="20" y1="75" x2="430" y2="75" stroke="#94a3b8" stroke-width="1" />
+                            <line x1="50" y1="10" x2="50" y2="140" stroke="#94a3b8" stroke-width="1" />
+                            <text x="35" y="20" fill="#64748b" font-size="10">2</text>
+                            <text x="35" y="135" fill="#64748b" font-size="10">-2</text>
+                            <text x="320" y="90" fill="#64748b" font-size="10">2&pi;</text>
+
+                            <!-- Lineas Guia -->
+                            <line x1="45" y1="15" x2="55" y2="15" stroke="#94a3b8" />
+                            <line x1="45" y1="135" x2="55" y2="135" stroke="#94a3b8" />
+                            <line x1="320" y1="70" x2="320" y2="80" stroke="#94a3b8" />
+
+                            <path id="lab-wave" d="M 50,75" fill="none" stroke="#8b5cf6" stroke-width="3"/>
+                        </svg>
+
+                        <div style="display:flex; width:100%; gap:20px; align-items:center; margin-top:10px;">
+                            <div style="flex: 1; text-align: left;">
+                                <label style="font-size: 0.9rem; font-weight:bold;">Amplitud (A): <span id="val-a">1</span></label>
+                                <input type="range" id="slider-a" min="-2" max="2" step="0.5" value="1" oninput="drawLabWave()">
+                            </div>
+                            <div style="flex: 1; text-align: left;">
+                                <label style="font-size: 0.9rem; font-weight:bold;">Freq (B): <span id="val-b">1</span></label>
+                                <input type="range" id="slider-b" min="0.5" max="3" step="0.5" value="1" oninput="drawLabWave()">
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="background:#f1f5f9; padding:8px; border-radius:8px; border:1px solid #cbd5e1; text-align:center;">
+                                    <p id="lab-eq" style="margin:0; font-weight:bold; color:#0f172a;">$y = 1 \sin(1x)$</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 7: Quiz 1 -->
+                <div class="slide">
+                    <div class="content-box-vertical">
+                        <h2>Reto 1: Identificando la Onda</h2>
+                        <p>Si observas una gráfica trigonométrica y notas que cruza el eje $Y$ en $(0,1)$, es decir, arranca desde su punto más alto, ¿qué función es más probable que sea?</p>
+                        <div class="quiz-container">
+                            <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'El Seno inicia en $(0,0)$, cruzando por el origen.')">A) El Seno ($y = \sin x$)</button>
+                            <button class="option-btn" onclick="checkQuiz(1, true, this, '¡Correcto! El Coseno inicia en su cresta máxima (1) sobre el eje Y.', '')">B) El Coseno ($y = \cos x$)</button>
+                            <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'La Tangente es discontinua y pasa por el origen $(0,0)$.')">C) La Tangente ($y = \tan x$)</button>
+                        </div>
+                        <div id="feedback-1" style="margin-top: 0.8rem; font-weight: 600; min-height: 24px;"></div>
+                    </div>
+                </div>
+
+                <!-- Slide 8: Quiz 2 -->
+                <div class="slide">
+                    <div class="content-box-vertical">
+                        <h2>Reto 2: Entendiendo la Amplitud</h2>
+                        <p>¿Qué sucede gráficamente con la función $y = 5\sin x$ comparada con la función original $y = \sin x$?</p>
+                        <div class="quiz-container">
+                            <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'Eso ocurriría si alteramos B (el período), no A.')">A) La onda se comprime horizontalmente (se aprieta).</button>
+                            <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'El signo de la amplitud es positivo, así que no se invierte.')">B) La onda se invierte y va hacia abajo.</button>
+                            <button class="option-btn" onclick="checkQuiz(2, true, this, '¡Excelente! El multiplicador 5 aumenta la altura de las crestas y la profundidad de los valles.', '')">C) La onda se estira verticalmente alcanzando una altura de 5.</button>
+                        </div>
+                        <div id="feedback-2" style="margin-top: 0.8rem; font-weight: 600; min-height: 24px;"></div>
+                    </div>
+                </div>
+
+                <!-- Slide 9: Quiz 3 -->
+                <div class="slide">
+                    <div class="content-box-vertical">
+                        <h2>Reto 3: Calculando el Período</h2>
+                        <p>Dada la función $y = \sin(2x)$, ¿cuál es el nuevo período de la onda? (Recuerda que $\text{Período} = \frac{2\pi}{B}$)</p>
+                        <div class="quiz-container">
+                            <button class="option-btn" onclick="checkQuiz(3, true, this, '¡Correcto! $2\pi / 2 = \pi$. Completa un ciclo en la mitad del tiempo.', '')">A) $\pi$</button>
+                            <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'No. Divide $2\pi$ entre $B$ ($B=2$).')">B) $2\pi$</button>
+                            <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'No. Divide $2\pi$ entre 2.')">C) $4\pi$</button>
+                        </div>
+                        <div id="feedback-3" style="margin-top: 0.8rem; font-weight: 600; min-height: 24px;"></div>
+                    </div>
+                </div>
+
+                <!-- Slide 10: Final -->
+                <div class="slide">
+                    <div class="content-box-vertical">
+                        <div style="font-size: 80px;">🏆</div>
+                        <h2>¡Lección Completada!</h2>
+                        <p>¡Eres un experto en el análisis gráfico de las ondas trigonométricas!</p>
+                        <button onclick="goToSlide(0)" class="interactive-btn" style="padding: 1rem 2rem; border-radius: 30px; margin-top: 1.5rem; font-size: 1.1rem;">Volver a repasar</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled aria-label="Anterior">&#8592;</button>
+        <button class="nav-btn" id="next-btn" onclick="nextSlide()" aria-label="Siguiente">&#8594;</button>
+
+        <div class="slide-indicators">
+            <span id="slide-num">1 / 10</span>
+        </div>
+
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const totalSlides = 10;
+        const slideContainer = document.getElementById('slide-container');
+        const slideNumDisplay = document.getElementById('slide-num');
+        const progressBar = document.getElementById('progress-bar');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+
+        function updateSlide() {
+            slideContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
+            slideNumDisplay.textContent = `${currentSlide + 1} / ${totalSlides}`;
+            
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            progressBar.style.width = `${progress}%`;
+
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === totalSlides - 1;
+
+            const slides = document.querySelectorAll('.slide');
+            slides.forEach((slide, index) => {
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+            
+            if(window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        function goToSlide(num) {
+            currentSlide = num;
+            updateSlide();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        // Interactive Lab
+        function drawLabWave() {
+            const A = parseFloat(document.getElementById('slider-a').value);
+            const B = parseFloat(document.getElementById('slider-b').value);
+            
+            document.getElementById('val-a').textContent = A;
+            document.getElementById('val-b').textContent = B;
+            
+            let eq = `$$y = ${A} \\sin(${B}x)$$`;
+            if (A === 1) eq = `$$y = \\sin(${B}x)$$`;
+            if (B === 1 && A !== 1) eq = `$$y = ${A} \\sin(x)$$`;
+            if (A === 1 && B === 1) eq = `$$y = \\sin(x)$$`;
+            
+            document.getElementById('lab-eq').innerHTML = eq;
+            
+            // Re-render mathjax for the specific element
+            if(window.MathJax) {
+                MathJax.typesetPromise([document.getElementById('lab-eq')]);
+            }
+
+            // Draw wave path
+            // center Y is 75. Amplitude 1 is 60 pixels (so max is 15, min is 135)
+            const originX = 50;
+            const originY = 75;
+            const pxPerRad = (320 - 50) / (2 * Math.PI); // 2pi ends at x=320
+
+            let path = `M ${originX},${originY} `;
+            
+            for (let xPix = originX; xPix <= 420; xPix += 5) {
+                // convert pixel to radians
+                let rads = (xPix - originX) / pxPerRad;
+                let yVal = A * Math.sin(B * rads);
+                let yPix = originY - (yVal * 60);
+                path += `L ${xPix},${yPix} `;
+            }
+            
+            document.getElementById('lab-wave').setAttribute('d', path);
+        }
+
+        function checkQuiz(quizNum, isCorrect, btnElement, correctMsg, wrongMsg) {
+            const container = btnElement.parentElement;
+            const buttons = container.querySelectorAll('.option-btn');
+            const feedback = document.getElementById(`feedback-${quizNum}`);
+
+            buttons.forEach(btn => {
+                btn.style.borderColor = '#e2e8f0';
+                btn.style.background = 'white';
+                btn.style.color = '#1e293b';
+            });
+
+            if (isCorrect) {
+                btnElement.style.borderColor = 'var(--primary-green)';
+                btnElement.style.background = '#f0fdf4';
+                btnElement.style.color = '#166534';
+                feedback.style.color = 'var(--primary-green)';
+                feedback.textContent = correctMsg;
+            } else {
+                btnElement.style.borderColor = 'var(--primary-red)';
+                btnElement.style.background = '#fef2f2';
+                btnElement.style.color = '#991b1b';
+                feedback.style.color = '#991b1b';
+                feedback.textContent = wrongMsg;
+            }
+        }
+
+        // Init lab
+        drawLabWave();
+        updateSlide();
+    </script>
+</body>
+</html>

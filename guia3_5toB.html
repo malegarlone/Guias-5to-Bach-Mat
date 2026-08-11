@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lección 3: Identidades Trigonométricas - 5to Bachillerato</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Outfit:wght@400;700&display=swap" rel="stylesheet">
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary-orange: #db6015;
+            --primary-yellow: #f7be00;
+            --primary-blue-dark: #244b5a;
+            --primary-green: #22c55e;
+            --primary-red: #ef4444;
+            --primary-purple: #8b5cf6;
+            --bg-light: #f8fafc;
+            --transition-speed: 0.5s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e2e8f0;
+            color: #1e293b;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 960px;
+            height: 540px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            margin: auto;
+        }
+
+        header {
+            background-color: var(--primary-blue-dark);
+            color: white;
+            padding: 0 1.5rem;
+            height: 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            z-index: 200;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        #viewport {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        .slide-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            padding: 12px 65px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transition: opacity var(--transition-speed);
+            overflow-y: auto;
+        }
+
+        .slide.active { opacity: 1; }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.1rem;
+            color: var(--primary-orange);
+            margin-bottom: 0.4rem;
+            font-weight: 800;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            color: var(--primary-blue-dark);
+            margin-bottom: 0.2rem;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: 0.92rem;
+            color: #444;
+            max-width: 820px;
+            line-height: 1.5;
+            margin-bottom: 0.3rem;
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+            z-index: 250;
+            border: 1px solid #ddd;
+            color: var(--primary-blue-dark);
+            font-size: 1.3rem;
+            user-select: none;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-50%) scale(1.1);
+            color: var(--primary-orange);
+            border-color: var(--primary-orange);
+        }
+
+        .nav-btn:disabled { opacity: 0; pointer-events: none; }
+        #prev-btn { left: 15px; }
+        #next-btn { right: 15px; }
+
+        .slide-indicators {
+            position: absolute;
+            bottom: 1.2rem;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            font-size: 0.85rem;
+            color: #888;
+            z-index: 100;
+        }
+
+        .progress-bar-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: #edf2f7;
+            z-index: 100;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--primary-orange);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            width: 100%;
+            max-width: 620px;
+            margin: 0.4rem auto;
+        }
+
+        .option-btn {
+            padding: 0.7rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary-orange);
+            background: #fffcf9;
+        }
+
+        .content-box-vertical {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            max-width: 820px;
+            flex: 1;
+            margin: 4px 0;
+        }
+
+        .interactive-btn {
+            background: var(--primary-orange);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .interactive-btn:hover { background: #c4500e; }
+
+        .equation-box {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 5px;
+            font-size: 1.1rem;
+            width: 100%;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app-container">
+        <header id="global-header">
+            <span>Colegio Escolaris - Matemática 5to Bachillerato</span>
+            <span>Lección 3: Identidades Trigonométricas</span>
+        </header>
+
+        <div id="viewport">
+            <div class="slide-container" id="slide-container">
+                
+                <!-- Slide 1: Portada -->
+                <div class="slide active">
+                    <div class="content-box-vertical">
+                        <div style="font-size: 80px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));">⚖️✨🧩</div>
+                        <h1>Identidades Trigonométricas</h1>
+                        <h2>Lección 3 &bull; 5&deg; Bachillerato</h2>
+                        <p style="color: #64748b; font-style: italic;">Aprende el arte de simplificar y transformar expresiones complejas utilizando las reglas fundamentales de la trigonometría.</p>
+                    </div>
+                </div>
+
+                <!-- Slide 2: Qué es una Identidad -->
+                <div class="slide">
+                    <h2>¿Qué es una Identidad?</h2>
+                    <p>En matemáticas, una **Identidad** es una igualdad que siempre es verdadera sin importar el valor que tome la variable (el ángulo $\theta$). ¡Es como un sinónimo matemático!</p>
+                    <div class="content-box-vertical" style="background: #ffffff; padding: 14px 20px; border-radius: 16px; border: 2px solid #cbd5e1;">
+                        <svg width="400" height="150" viewBox="0 0 400 150" style="display: block; margin: auto;">
+                            <!-- Equation vs Identity -->
+                            <rect x="20" y="25" width="160" height="100" fill="#fef2f2" stroke="#ef4444" stroke-width="2" rx="10"/>
+                            <text x="100" y="55" fill="#ef4444" font-weight="bold" text-anchor="middle">Ecuación Normal</text>
+                            <text x="100" y="85" fill="#991b1b" font-size="14" text-anchor="middle">2x = 10</text>
+                            <text x="100" y="105" fill="#991b1b" font-size="12" text-anchor="middle">(Solo sirve si x=5)</text>
+
+                            <text x="200" y="80" fill="#64748b" font-weight="bold" font-size="20" text-anchor="middle">VS</text>
+
+                            <rect x="220" y="25" width="160" height="100" fill="#f0fdf4" stroke="#22c55e" stroke-width="2" rx="10"/>
+                            <text x="300" y="55" fill="#166534" font-weight="bold" text-anchor="middle">Identidad</text>
+                            <text x="300" y="85" fill="#166534" font-size="14" text-anchor="middle">x + x = 2x</text>
+                            <text x="300" y="105" fill="#166534" font-size="12" text-anchor="middle">(¡Sirve para CUALQUIER x!)</text>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Slide 3: Identidades Recíprocas y Cociente -->
+                <div class="slide">
+                    <h2>Identidades Básicas</h2>
+                    <p>Existen 6 funciones trigonométricas. 3 de ellas son "inversas" (recíprocas) de las principales. Y la Tangente se puede formar dividiendo.</p>
+                    <div class="content-box-vertical" style="background: #ffffff; padding: 10px 18px; border-radius: 16px; border: 2px solid #cbd5e1;">
+                        <div style="display: flex; gap: 10px; width: 100%; align-items: stretch;">
+                            <div style="flex: 1; background: #f0f9ff; border: 1px solid #0284c7; padding:10px; border-radius:8px;">
+                                <h3 style="color:#0369a1; font-size:1rem; margin-bottom:5px;">Recíprocas</h3>
+                                <p style="font-size:0.9rem; margin-bottom:5px;">$$ \csc \theta = \frac{1}{\sin \theta} $$</p>
+                                <p style="font-size:0.9rem; margin-bottom:5px;">$$ \sec \theta = \frac{1}{\cos \theta} $$</p>
+                                <p style="font-size:0.9rem; margin-bottom:0;">$$ \cot \theta = \frac{1}{\tan \theta} $$</p>
+                            </div>
+                            <div style="flex: 1; background: #fdf4ff; border: 1px solid #c026d3; padding:10px; border-radius:8px;">
+                                <h3 style="color:#86198f; font-size:1rem; margin-bottom:5px;">De Cociente</h3>
+                                <p style="font-size:0.9rem; margin-bottom:15px;">$$ \tan \theta = \frac{\sin \theta}{\cos \theta} $$</p>
+                                <p style="font-size:0.9rem; margin-bottom:0;">$$ \cot \theta = \frac{\cos \theta}{\sin \theta} $$</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 4: Identidad Pitagórica -->
+                <div class="slide">
+                    <h2>La Identidad de Oro (Pitagórica)</h2>
+                    <p>En el Círculo Unitario, si el radio es 1, el Teorema de Pitágoras ($a^2 + b^2 = c^2$) se convierte en la identidad más famosa de la trigonometría.</p>
+                    <div class="content-box-vertical" style="background: #ffffff; padding: 14px 20px; border-radius: 16px; border: 2px solid #cbd5e1; display:flex; flex-direction:row; gap:15px; align-items:center;">
+                        <div style="flex: 1; max-width:200px;">
+                            <svg width="180" height="150" viewBox="0 0 180 150" style="display: block; margin: auto;">
+                                <line x1="20" y1="130" x2="160" y2="130" stroke="#0284c7" stroke-width="4" />
+                                <text x="90" y="145" fill="#0284c7" font-weight="bold">cos &theta;</text>
+
+                                <line x1="160" y1="130" x2="160" y2="30" stroke="#22c55e" stroke-width="4" />
+                                <text x="175" y="80" fill="#166534" font-weight="bold" transform="rotate(-90 175 80)">sin &theta;</text>
+
+                                <line x1="20" y1="130" x2="160" y2="30" stroke="#1e293b" stroke-width="3" />
+                                <text x="70" y="70" fill="#1e293b" font-weight="bold">1</text>
+                            </svg>
+                        </div>
+                        <div style="flex: 1; text-align:center;">
+                            <div class="equation-box" style="background:#fffbeb; border-color:#f59e0b; color:#b45309; padding: 20px;">
+                                $$ \sin^2\theta + \cos^2\theta = 1 $$
+                            </div>
+                            <p style="font-size:0.85rem; color:#475569; margin-top:10px;">(Nota: $\sin^2\theta$ es solo la forma matemática elegante de escribir $(\sin\theta)^2$)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 5: Trucos de Simplificación -->
+                <div class="slide">
+                    <h2>El Arte de Simplificar</h2>
+                    <p>Cuando te pidan simplificar o demostrar una expresión gigante, sigue la regla de oro:</p>
+                    <div class="content-box-vertical" style="background: #ffffff; padding: 14px 20px; border-radius: 16px; border: 2px solid #cbd5e1;">
+                        <div style="background: #f0fdf4; border: 2px dashed #22c55e; border-radius: 12px; padding: 20px; width: 100%;">
+                            <h3 style="color:#166534; font-size:1.3rem; margin-bottom:10px;">Regla de Oro</h3>
+                            <p style="font-size: 1.1rem; color: #166534; font-weight:bold;">¡Transforma TODO a Senos y Cosenos!</p>
+                            <p style="font-size: 0.95rem; color: #334155; margin-top:10px;">Si ves un $\tan$, cámbialo por $\frac{\sin}{\cos}$. Si ves un $\sec$, cámbialo por $\frac{1}{\cos}$. Luego usa el álgebra común (sumar fracciones, cancelar) para reducirlo.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 6: Ejemplo Práctico -->
+                <div class="slide">
+                    <h2>Ejemplo Paso a Paso</h2>
+                    <p>Simplifiquemos la expresión: $$ \tan\theta \cdot \cos\theta $$</p>
+                    <div class="content-box-vertical" style="background: #ffffff; padding: 14px 20px; border-radius: 16px; border: 2px solid #cbd5e1;">
+                        <div style="display: flex; flex-direction: column; gap: 10px; width: 100%; text-align: left;">
+                            <div style="background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #cbd5e1;">
+                                <p style="margin:0; font-weight:bold; color:#334155;">Paso 1: Transforma la tangente (Identidad de cociente).</p>
+                                <p style="margin:0; text-align:center;">$$ = \left( \frac{\sin\theta}{\cos\theta} \right) \cdot \cos\theta $$</p>
+                            </div>
+                            <div style="background:#f8fafc; padding:10px; border-radius:8px; border:1px solid #cbd5e1;">
+                                <p style="margin:0; font-weight:bold; color:#334155;">Paso 2: Haz el álgebra visualmente (¡Cancelar!).</p>
+                                <p style="margin:0; text-align:center;">$$ = \frac{\sin\theta \cdot \require{cancel}\cancel{\cos\theta}}{\require{cancel}\cancel{\cos\theta}} $$</p>
+                            </div>
+                            <div style="background:#dcfce7; padding:10px; border-radius:8px; border:2px solid #22c55e;">
+                                <p style="margin:0; font-weight:bold; color:#166534; text-align:center;">Resultado Final: $$ = \sin\theta $$</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 7: Quiz 1 -->
+                <div class="slide">
+                    <div class="content-box-vertical">
+                        <h2>Reto 1: Memorizando Recíprocas</h2>
+                        <p>¿Cuál es la función trigonométrica que sirve como recíproca (inversa multiplicativa) del Coseno? (Es decir, $1 / \cos\theta$)</p>
+                        <div class="quiz-container">
+                            <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'No. La Cosecante ($\csc$) es la recíproca del Seno.')">A) La Cosecante ($\csc\theta$)</button>
+                            <button class="option-btn" onclick="checkQuiz(1, true, this, '¡Correcto! La Secante es la recíproca del Coseno.', '')">B) La Secante ($\sec\theta$)</button>
+                            <button class="option-btn" onclick="checkQuiz(1, false, this, '', 'No. La Tangente es seno sobre coseno.')">C) La Tangente ($\tan\theta$)</button>
+                        </div>
+                        <div id="feedback-1" style="margin-top: 0.8rem; font-weight: 600; min-height: 24px;"></div>
+                    </div>
+                </div>
+
+                <!-- Slide 8: Quiz 2 -->
+                <div class="slide">
+                    <div class="content-box-vertical">
+                        <h2>Reto 2: Álgebra de Identidades</h2>
+                        <p>Si la Identidad Pitagórica es $\sin^2\theta + \cos^2\theta = 1$, ¿qué obtienes si despejas el seno al cuadrado moviendo el coseno al otro lado?</p>
+                        <div class="quiz-container">
+                            <button class="option-btn" onclick="checkQuiz(2, true, this, '¡Exacto! Al pasar restando, obtienes esta variación muy útil de la identidad pitagórica.', '')">A) $\sin^2\theta = 1 - \cos^2\theta$</button>
+                            <button class="option-btn" onclick="checkQuiz(2, false, this, '', '¡Cuidado con los signos algebraicos! Al pasarlo del otro lado del signo igual, pasa restando, no sumando.')">B) $\sin^2\theta = 1 + \cos^2\theta$</button>
+                            <button class="option-btn" onclick="checkQuiz(2, false, this, '', 'No puedes eliminar el cuadrado mágicamente. Debe ser $\cos^2$.')">C) $\sin^2\theta = 1 - \cos\theta$</button>
+                        </div>
+                        <div id="feedback-2" style="margin-top: 0.8rem; font-weight: 600; min-height: 24px;"></div>
+                    </div>
+                </div>
+
+                <!-- Slide 9: Quiz 3 -->
+                <div class="slide">
+                    <div class="content-box-vertical">
+                        <h2>Reto 3: Mente Ágil</h2>
+                        <p>De manera mental, intenta simplificar esta expresión siguiendo la regla de oro: $$ \sec\theta \cdot \cos\theta $$</p>
+                        <div class="quiz-container">
+                            <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'No. Transforma la secante a $1/\cos$. ¿Qué pasa al multiplicar por $\cos$? ')">A) $\sin\theta$</button>
+                            <button class="option-btn" onclick="checkQuiz(3, false, this, '', 'Recuerda que $\sec = 1/\cos$. No da $\tan$.')">B) $\tan\theta$</button>
+                            <button class="option-btn" onclick="checkQuiz(3, true, this, '¡Genial! Al sustituir, tienes $(1/\cos\theta) \cdot \cos\theta$, los cosenos se cancelan y queda 1.', '')">C) $1$</button>
+                        </div>
+                        <div id="feedback-3" style="margin-top: 0.8rem; font-weight: 600; min-height: 24px;"></div>
+                    </div>
+                </div>
+
+                <!-- Slide 10: Final -->
+                <div class="slide">
+                    <div class="content-box-vertical">
+                        <div style="font-size: 80px;">🏆</div>
+                        <h2>¡Lección Completada!</h2>
+                        <p>Has destrabado el nivel de manipular ecuaciones trigonométricas a tu favor.</p>
+                        <button onclick="goToSlide(0)" class="interactive-btn" style="padding: 1rem 2rem; border-radius: 30px; margin-top: 1.5rem; font-size: 1.1rem;">Volver a repasar</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <button class="nav-btn" id="prev-btn" onclick="prevSlide()" disabled aria-label="Anterior">&#8592;</button>
+        <button class="nav-btn" id="next-btn" onclick="nextSlide()" aria-label="Siguiente">&#8594;</button>
+
+        <div class="slide-indicators">
+            <span id="slide-num">1 / 10</span>
+        </div>
+
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const totalSlides = 10;
+        const slideContainer = document.getElementById('slide-container');
+        const slideNumDisplay = document.getElementById('slide-num');
+        const progressBar = document.getElementById('progress-bar');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+
+        function updateSlide() {
+            slideContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
+            slideNumDisplay.textContent = `${currentSlide + 1} / ${totalSlides}`;
+            
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            progressBar.style.width = `${progress}%`;
+
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === totalSlides - 1;
+
+            const slides = document.querySelectorAll('.slide');
+            slides.forEach((slide, index) => {
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+            
+            if(window.MathJax) {
+                MathJax.typesetPromise();
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlide();
+            }
+        }
+
+        function goToSlide(num) {
+            currentSlide = num;
+            updateSlide();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        function checkQuiz(quizNum, isCorrect, btnElement, correctMsg, wrongMsg) {
+            const container = btnElement.parentElement;
+            const buttons = container.querySelectorAll('.option-btn');
+            const feedback = document.getElementById(`feedback-${quizNum}`);
+
+            buttons.forEach(btn => {
+                btn.style.borderColor = '#e2e8f0';
+                btn.style.background = 'white';
+                btn.style.color = '#1e293b';
+            });
+
+            if (isCorrect) {
+                btnElement.style.borderColor = 'var(--primary-green)';
+                btnElement.style.background = '#f0fdf4';
+                btnElement.style.color = '#166534';
+                feedback.style.color = 'var(--primary-green)';
+                feedback.textContent = correctMsg;
+            } else {
+                btnElement.style.borderColor = 'var(--primary-red)';
+                btnElement.style.background = '#fef2f2';
+                btnElement.style.color = '#991b1b';
+                feedback.style.color = '#991b1b';
+                feedback.textContent = wrongMsg;
+            }
+        }
+
+        updateSlide();
+    </script>
+</body>
+</html>
